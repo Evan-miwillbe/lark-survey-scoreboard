@@ -154,7 +154,26 @@ lark-cli base +form-questions-create \
 
 **关键：** 逐条添加（每次1道），不能批量，否则飞书 API 可能乱序。
 
-### Step 4: 创建仪表盘 + 维度图表
+### Step 4: 创建公式字段（可选：维度均分）
+
+如果图表中需要显示维度平均分，先创建 formula 字段：
+
+```bash
+# 先获取实际字段名（--limit 200 确保 100+ 字段的表不全截断）
+lark-cli base +field-list --base-token <BT> --table-id <TI> --limit 200
+
+# 创建公式字段（注意 --i-have-read-guide 标志）
+lark-cli base +field-create \
+  --base-token <BT> --table-id <TI> \
+  --json '{"type":"formula","name":"【均分】维度名","expression":"AVERAGE([题1],[题2],...)"}' \
+  --i-have-read-guide
+```
+
+> **关键：** formula 字段创建必须带 `--i-have-read-guide`，否则 CLI 会拒绝执行。表达式中的字段名必须用 `[字段名]` 包裹，且与 Base 中实际字段名完全一致。
+
+### Step 5: 创建仪表盘 + 维度图表
+
+**执行前需要确认：** 询问用户图表是否需要按某个字段分组（如按部门分组）。如果不分组，每个图表只显示整体平均分。
 
 ```bash
 lark-cli base +dashboard-create --base-token <BT> --name "<看板名称>"
@@ -165,16 +184,34 @@ lark-cli base +dashboard-block-create \
   --name "填写人数" --type statistics \
   --data-config '{"table_name":"数据表","count_all":true}'
 
-# 维度条形图
+# 维度条形图（不分组版）
 lark-cli base +dashboard-block-create \
   --base-token <BT> --dashboard-id <DI> \
   --name "维度名称" --type bar \
-  --data-config '{"table_name":"数据表","series":[{"field_name":"题1","rollup":"AVERAGE"},...]}'
+  --data-config '{"table_name":"数据表","series":[{"field_name":"【均分】维度名","rollup":"AVERAGE"},{"field_name":"题1","rollup":"AVERAGE"},...]}' \
+  --no-validate
+
+# 维度条形图（按部门分组版）
+lark-cli base +dashboard-block-create \
+  --base-token <BT> --dashboard-id <DI> \
+  --name "维度名称" --type bar \
+  --data-config '{"table_name":"数据表","series":[{"field_name":"【均分】维度名","rollup":"AVERAGE"},{"field_name":"题1","rollup":"AVERAGE"},...],"group_by":[{"field_name":"部门名称","mode":"integrated"}]}'
 
 lark-cli base +dashboard-arrange --base-token <BT> --dashboard-id <DI>
 ```
 
-### Step 5: 分享
+> **飞书会自动给图表加 group_by！** 如果你不想要分组，创建图表后必须用 `--no-validate` 参数更新，显式传 `group_by: []` 才能移除。普通 `+dashboard-block-update` 不带 `--no-validate` 时，CLI 校验会丢弃空的 `group_by`，导致飞书自动添加的分组无法清除。
+
+**移除已有图表的 group_by：**
+
+```bash
+lark-cli base +dashboard-block-update \
+  --base-token <BT> --dashboard-id <DI> --block-id <BLOCK_ID> \
+  --data-config '{"table_name":"数据表","series":[...],"group_by":[]}' \
+  --no-validate
+```
+
+### Step 6: 分享
 
 - **填问卷：** 分享表单链接
 - **看仪表盘：** 需要该多维表格的查看权限
@@ -238,6 +275,10 @@ s deploy
 | 表单描述显示 `\n` | 用**单引号** `'...'` 包裹，内部真实换行 |
 | 题目标题带 "N." 前缀 | 去掉 "N."，只保留题目文字 |
 | 图表创建 EOF 错误 | 重试；脚本中加 `time.sleep(0.5)` |
+| **飞书自动给图表加 group_by** | 用 `--no-validate` + `group_by: []` 更新图表 |
+| **+field-list 只返回 100 条** | 加 `--limit 200`（表超过 100 字段时必须） |
+| **formula 字段创建被拒绝** | 加 `--i-have-read-guide` 标志 |
+| **form-questions-create EOF/TLS** | 加重试逻辑（5次，间隔 2-3 秒）；验证实际创建结果 |
 | FC3 响应被浏览器下载 | 前后端**分离部署**：HTML 放 GitHub Pages |
 | OSS 所有文件强制下载 | 用 GitHub Pages，或绑定自定义域名 |
 | CORS 阻止前端请求 | Express 设置 `Access-Control-Allow-Origin: *` |
@@ -380,6 +421,11 @@ scoreboard/
 | 题目标题带 "N." 前缀 | 和飞书自带序号重复 | 去掉 "N."，只保留题目文字 |
 | 图表创建 EOF 错误 | 网络波动 | 重试；脚本中加 `time.sleep(0.5)` |
 | `+field-list` 返回 `field_name: null` | form 创建的字段用 `name` | 用 jq 取 `.name` 或 `+field-get` |
+| **`+field-list` 只返回前 100 条** | 默认分页 limit=100 | 加 `--limit 200`（表有 100+ 字段时必须） |
+| **form-questions-create EOF/TLS 超时** | 飞书 API 不稳定 | 加重试逻辑（5 次，间隔 2-3 秒）；执行完后用 `+field-list` 验证实际创建数 |
+| **formula 字段创建被拒绝** | CLI 要求用户确认已阅读 guide | 加 `--i-have-read-guide` 标志 |
+| **飞书自动给图表加 group_by** | 飞书 web UI 会在图表上自动设置分组 | 创建后用 `--no-validate` + `group_by: []` 更新移除 |
+| **CLI 校验丢弃空 group_by** | `+dashboard-block-update` 默认校验会过滤空数组 | 必须加 `--no-validate` 才能让空的 `group_by: []` 传到 API |
 | Python subprocess 找不到 lark-cli | Windows 下 npm 全局命令需要完整路径 | 使用 `C:/Users/<user>/AppData/Roaming/npm/lark-cli.cmd` |
 
 ### 进阶版踩坑（实际经历，按严重度排序）

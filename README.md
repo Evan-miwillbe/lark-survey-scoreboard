@@ -331,6 +331,10 @@ const API_BASE = 'https://your-func.cn-hangzhou.fcapp.run';
 | 问题 | 原因 | 解决方案 |
 |------|------|---------|
 | 题目顺序错乱 | 批量添加时飞书 API 内部乱序 | **逐条添加**，每次只传 1 道题 |
+| **飞书自动给图表加 group_by** | 飞书 web UI 自动按第一个文本字段分组 | 用 `--no-validate` + `group_by: []` 更新移除 |
+| **+field-list 只返回 100 条** | 默认分页 limit=100 | 加 `--limit 200` |
+| **formula 字段创建被拒绝** | CLI 要求确认 | 加 `--i-have-read-guide` |
+| **form-questions-create EOF** | 飞书 API 不稳定 | 重试 5 次 + 创建后验证 |
 | FC3 响应被浏览器下载 | FC3 注入 Content-Disposition: attachment | 前后端分离：HTML 放 GitHub Pages |
 | CORS 阻止请求 | 前端和 API 在不同域名 | Express 设置 `Access-Control-Allow-Origin: *` |
 | OSS 文件强制下载 | 阿里云 OSS 共享域名全局强制下载 | 用 GitHub Pages 托管静态文件 |
