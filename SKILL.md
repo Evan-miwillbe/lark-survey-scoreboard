@@ -424,8 +424,8 @@ scoreboard/
 | **`+field-list` 只返回前 100 条** | 默认分页 limit=100 | 加 `--limit 200`（表有 100+ 字段时必须） |
 | **form-questions-create EOF/TLS 超时** | 飞书 API 不稳定 | 加重试逻辑（5 次，间隔 2-3 秒）；执行完后用 `+field-list` 验证实际创建数 |
 | **formula 字段创建被拒绝** | CLI 要求用户确认已阅读 guide | 加 `--i-have-read-guide` 标志 |
-| **飞书自动给图表加 group_by** | 飞书 web UI 会在图表上自动设置分组 | 创建后用 `--no-validate` + `group_by: []` 更新移除 |
-| **CLI 校验丢弃空 group_by** | `+dashboard-block-update` 默认校验会过滤空数组 | 必须加 `--no-validate` 才能让空的 `group_by: []` 传到 API |
+| **飞书自动给图表加 group_by** | 飞书 web UI 检测到文本字段就自动用它分组（如"部门名称"），每次打开看板都会重新加回来 | **根因是表里有文本字段**：要么删掉文本字段，要么改用单选类型；`--no-validate` + `group_by: []` 只能临时清除，刷新看板后又会恢复 |
+| **CLI 校验丢弃空 group_by** | `+dashboard-block-update` 默认校验会过滤空数组 | 必须加 `--no-validate` 才能让空的 `group_by: []` 传到 API（但治标不治本，见上一条） |
 | Python subprocess 找不到 lark-cli | Windows 下 npm 全局命令需要完整路径 | 使用 `C:/Users/<user>/AppData/Roaming/npm/lark-cli.cmd` |
 
 ### 进阶版踩坑（实际经历，按严重度排序）

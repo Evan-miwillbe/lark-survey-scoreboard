@@ -26,16 +26,25 @@
 
 ### 2. 飞书会自动给图表加 group_by
 
-即使创建时不传 `group_by`，飞书 web UI 会自动给图表添加分组（通常是第一个文本字段，如"部门名称"）。**必须在创建后用 `--no-validate` 显式清除**：
+即使创建时不传 `group_by`，飞书 web UI 会自动给图表添加分组（通常是第一个文本字段，如"部门名称"）。**每次打开看板都会重新加回来**。
+
+`--no-validate` + `group_by: []` 只能临时清除，刷新看板后飞书又会自动恢复分组。
+
+**根因是表里存在文本类型字段。** 解决方案（选一）：
+
+| 方案 | 做法 | 效果 |
+|------|------|------|
+| **不要文本字段** | 不添加"部门名称"等文本题，只保留姓名题 | 彻底避免自动分组 |
+| **改用单选字段** | 把"部门名称"从 text 改成 select 类型 | 飞书不会用单选字段自动分组 |
+| **接受分组** | 保留文本字段，图表按分组展示 | 每个维度会按部门分别显示 |
 
 ```bash
+# 临时清除 group_by（刷新后会恢复）
 lark-cli base +dashboard-block-update \
   --base-token <BT> --dashboard-id <DI> --block-id <BLOCK_ID> \
   --data-config '{"table_name":"数据表","series":[...],"group_by":[]}' \
   --no-validate
 ```
-
-> 不加 `--no-validate` 时，CLI 校验会丢弃空的 `group_by: []`，导致请求不传这个字段，飞书保留自动添加的分组。
 
 ### 3. form-questions-create API 不稳定
 
