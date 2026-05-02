@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
-    "setup": "node scripts/setup.js"
+    "from-minutes": "node src/generate-from-minutes.js",
+    "report": "node src/generate-report.js"
   },
   "keywords": [
     "feishu",

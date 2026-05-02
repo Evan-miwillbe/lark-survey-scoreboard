@@ -6,6 +6,38 @@
 
 ---
 
+## 核心亮点：从飞书妙记到完整评估闭环
+
+一句话触发完整智能工作流：
+
+```
+"帮我根据这场培训的飞书妙记，生成评分问卷，收集完反馈后出分析报告"
+```
+
+```
+┌─────────┐      ┌─────────────┐      ┌──────────┐      ┌──────────┐      ┌──────────┐
+│ 飞书妙记 │ ───→ │ AI分析内容   │ ───→ │ 自动创建  │ ───→ │ 实时收集  │ ───→ │ AI分析   │
+│ (会议记录)│      │ 提取主题维度  │      │ Base+表单 │      │ 手机评分  │      │ 生成报告  │
+└─────────┘      └─────────────┘      └──────────┘      └──────────┘      └──────────┘
+     ↑                                                        ↑                   ↓
+  lark-cli                                                大屏实时展示         写入飞书文档
+  读取妙记                                                (ECharts)          (自动分享)
+```
+
+**不只是工具，是智能工作流**：AI理解培训内容 → 自动生成针对性题目 → 实时收集反馈 → 生成洞察报告。全程无需人工编写题目、无需手动分析数据。
+
+### 快速体验
+
+```bash
+# 从飞书妙记一键生成评分系统
+npm run from-minutes https://your-feishu.com/minutes/xxx
+
+# 收集评分后生成AI分析报告
+npm run report "培训名称"
+```
+
+---
+
 ## 为什么需要它
 
 现场活动（年会/培训/面试）需要实时评分展示，但 Poll Everywhere 要 ¥850/年且限25人。本项目用飞书生态搭建完整替代方案：
@@ -59,20 +91,22 @@ npm start
 ## 项目结构
 
 ```
-├── src/                   # 后端源码（可直接运行）
-│   ├── server.js          # Express API — 6个端点
-│   ├── feishu.js          # 飞书 Open API 客户端
-│   ├── cache.js           # 内存缓存（毫秒级响应）
-│   └── questions.js       # 题目+维度配置（修改此文件适配你的问卷）
-├── public/                # 前端页面
-│   ├── rating.html        # 手机评分页（支持断点续填）
-│   └── dashboard.html     # 大屏看板（暗色主题 + ECharts）
-├── scripts/               # 自动化
-│   ├── setup-base.sh      # 一键创建飞书Base+表单+仪表盘
-│   └── deploy-fc3.sh      # 一键部署到阿里云FC3
-├── SKILL.md               # Claude Code Skill（AI可直接加载使用）
-├── SUBMISSION.md          # 参赛说明
-└── references/            # 详细文档（工作流/部署/踩坑）
+├── src/                          # 后端源码（可直接运行）
+│   ├── server.js                 # Express API — 6个端点
+│   ├── feishu.js                 # 飞书 Open API 客户端
+│   ├── cache.js                  # 内存缓存（毫秒级响应）
+│   ├── questions.js              # 题目+维度配置
+│   ├── generate-from-minutes.js  # 🔥 从飞书妙记自动生成问卷
+│   └── generate-report.js        # 🔥 评分完成后生成AI分析报告
+├── public/                       # 前端页面
+│   ├── rating.html               # 手机评分页（支持断点续填）
+│   └── dashboard.html            # 大屏看板（暗色主题 + ECharts）
+├── scripts/                      # 自动化
+│   ├── setup-base.sh             # 一键创建飞书Base+表单+仪表盘
+│   └── deploy-fc3.sh             # 一键部署到阿里云FC3
+├── SKILL.md                      # Claude Code Skill（AI可直接加载使用）
+├── SUBMISSION.md                 # 参赛说明
+└── references/                   # 详细文档（工作流/部署/踩坑）
 ```
 
 ## lark-cli 深度集成
