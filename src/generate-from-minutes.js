@@ -54,18 +54,56 @@ async function getMinutesContent(minutesId) {
 function analyzeAndGenerateQuestions(title, content) {
   console.log('[2/5] AI分析内容，生成评分维度和题目...');
 
-  const prompt = `分析以下培训/会议内容，提取3-6个核心主题作为评分维度，每个维度生成2-4道评分题目（1-10分制）。
+  const prompt = `你是一位专业的培训评估设计师。你的任务是根据一场培训/分享的实际内容，设计出针对性强、可操作的评分问卷。
 
-要求：
-- 维度名称简短（2-6字）
-- 题目具体可评分，避免模糊表述
-- 输出纯JSON格式
+## 你的工作流程
+
+**第一步：内容分析**
+仔细阅读会议记录，识别：
+- 讲了哪几个核心主题/模块？（这些将成为评分维度）
+- 每个主题中有哪些具体的知识点、演示、操作、观点？（这些将成为评分依据）
+- 这场会议的类型是什么？（培训教学/经验分享/产品演示/讨论会议）
+
+**第二步：设计维度**
+根据实际内容提取 3-6 个评分维度。维度必须来源于内容本身，不能是通用模板。
+
+好的维度示例（基于内容）：
+- "飞书CLI安装教学" — 如果讲师花了大量时间教安装
+- "实战案例质量" — 如果分享了多个实际案例
+- "互动答疑" — 如果有大量互动环节
+
+差的维度示例（通用模板）：
+- "内容质量" — 太泛，任何培训都能用
+- "讲师表现" — 没有和具体内容挂钩
+
+**第三步：设计题目**
+每个维度 2-4 道题。题目必须满足：
+1. **具体性**：提到实际讲过的内容。"讲师对XX的讲解是否易懂" 好于 "讲解是否清晰"
+2. **可区分性**：同一维度内的题目评分应该可能不同（测量不同侧面）
+3. **可操作性**：低分能指向具体改进方向
+4. **中性表述**：不暗示应该打高分或低分
+
+好的题目示例：
+- "AJ 演示的日历分析仪表盘案例，对你理解 CLI 能力有多大帮助"
+- "安装环节的步骤说明是否足够清晰，让你能独立完成"
+- "分享的视频长剪短功能，你在实际工作中用得上的可能性"
+
+差的题目示例：
+- "内容是否有用" — 太模糊
+- "讲师是否专业" — 无法指导改进
+- "你是否满意" — 一题概括所有
+
+## 输入信息
 
 会议主题：${title}
-内容摘要（前2000字）：${content.substring(0, 2000)}
+会议内容（文字记录）：
+${content.substring(0, 3000)}
 
-输出格式：
-{"dimensions":[{"name":"维度名","questions":["题目1","题目2"]}]}`;
+## 输出要求
+
+严格输出以下 JSON 格式，不要输出任何其他文字：
+
+{"dimensions":[{"name":"维度名(2-6字)","questions":["具体评分题目1","具体评分题目2","具体评分题目3"]}]}`;
 
   const tempFile = path.join(require('os').tmpdir(), 'survey-prompt.txt');
   fs.writeFileSync(tempFile, prompt);
@@ -80,9 +118,14 @@ function analyzeAndGenerateQuestions(title, content) {
   try {
     const jsonMatch = aiResult.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      if (result.dimensions && result.dimensions.length > 0) {
+        return result;
+      }
     }
-  } catch {}
+  } catch (e) {
+    console.log('  JSON解析失败，使用默认模板');
+  }
 
   return generateDefaultQuestions(title);
 }
