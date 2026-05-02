@@ -1,0 +1,29 @@
+{
+  "name": "lark-survey-scoreboard",
+  "version": "2.0.0",
+  "description": "零成本实时评分问卷+大屏看板 — 飞书做数据库，GitHub Pages做前端，阿里云FC3做后端。一句话搞定现场评分。",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "setup": "node scripts/setup.js"
+  },
+  "keywords": [
+    "feishu",
+    "lark-cli",
+    "survey",
+    "scoreboard",
+    "real-time",
+    "dashboard",
+    "poll-everywhere-alternative",
+    "zero-cost"
+  ],
+  "author": "Evan-miwillbe",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

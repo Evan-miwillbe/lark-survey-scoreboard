@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>实时评分</title>
+<style>
+:root{--primary:#1B2A4A;--accent:#F59E0B;--bg:#FAFAF8;--card:#fff;--text:#1a1a1a;--muted:#888;--border:#e5e5e5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:420px;margin:0 auto;padding:20px}
+h1{font-size:1.4rem;text-align:center;margin:20px 0;color:var(--primary)}
+.card{background:var(--card);border-radius:12px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+input,select{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-size:1rem;margin:8px 0}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+.btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:12px}
+.btn:active{opacity:0.8}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.dim-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0;margin:12px 0}
+.dim-tab{flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:0.85rem;cursor:pointer;white-space:nowrap}
+.dim-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.dim-tab .count{font-size:0.75rem;opacity:0.7;margin-left:4px}
+.question-card{background:var(--card);border-radius:12px;padding:16px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.question-title{font-size:0.9rem;margin-bottom:12px;line-height:1.4}
+.rating-row{display:flex;gap:4px;justify-content:center}
+.rating-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rating-btn.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:bold}
+.progress{text-align:center;color:var(--muted);font-size:0.85rem;margin:16px 0}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin:8px 0}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s}
+.hidden{display:none}
+.done-page{text-align:center;padding:40px 20px}
+.done-page h2{font-size:1.5rem;margin-bottom:12px}
+.done-page p{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 注册 -->
+  <div id="register-page">
+    <h1>评分问卷</h1>
+    <div class="card">
+      <input type="text" id="inp-name" placeholder="请输入您的姓名">
+      <input type="text" id="inp-dept" placeholder="请输入您的部门">
+      <button class="btn" onclick="doRegister()">开始评分</button>
+    </div>
+  </div>
+
+  <!-- 评分 -->
+  <div id="rating-page" class="hidden">
+    <div class="progress">
+      <span id="progress-text">0 / 0</span>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="dim-tabs" id="dim-tabs"></div>
+    <div id="questions-area"></div>
+  </div>
+
+  <!-- 完成 -->
+  <div id="done-page" class="hidden done-page">
+    <h2>评分完成</h2>
+    <p>感谢您的参与！数据已实时同步。</p>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+let questions = [];
+let dimensions = [];
+let myName = '';
+let myDept = '';
+let ratings = {};
+let activeDim = 0;
+
+async function doRegister() {
+  myName = document.getElementById('inp-name').value.trim();
+  myDept = document.getElementById('inp-dept').value.trim();
+  if (!myName || !myDept) return alert('请填写姓名和部门');
+
+  const saved = localStorage.getItem('survey_' + myName);
+  if (saved) ratings = JSON.parse(saved);
+
+  try {
+    const r = await fetch(API_BASE + '/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: myName, department: myDept })
+    });
+    const data = await r.json();
+    if (!data.ok) return alert(data.error || '注册失败');
+
+    if (data.scores && Object.keys(data.scores).length > 0) {
+      for (const [k, v] of Object.entries(data.scores)) {
+        ratings[k] = v;
+      }
+    }
+  } catch (e) {
+    console.warn('离线模式', e);
+  }
+
+  const qr = await fetch(API_BASE + '/api/questions');
+  const qd = await qr.json();
+  questions = qd.questions;
+  dimensions = qd.dimensions;
+
+  document.getElementById('register-page').classList.add('hidden');
+  document.getElementById('rating-page').classList.remove('hidden');
+  renderDimTabs();
+  renderQuestions();
+  updateProgress();
+}
+
+function renderDimTabs() {
+  const el = document.getElementById('dim-tabs');
+  el.innerHTML = dimensions.map((d, i) => {
+    const done = d.questionIndices.filter(idx => ratings[idx] !== undefined).length;
+    return `<div class="dim-tab ${i === activeDim ? 'active' : ''}" onclick="switchDim(${i})">${d.name}<span class="count">${done}/${d.questionIndices.length}</span></div>`;
+  }).join('');
+}
+
+function switchDim(i) {
+  activeDim = i;
+  renderDimTabs();
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const dim = dimensions[activeDim];
+  const area = document.getElementById('questions-area');
+  area.innerHTML = dim.questionIndices.map(idx => {
+    const btns = Array.from({length: 10}, (_, k) => {
+      const v = k + 1;
+      const sel = ratings[idx] === v ? 'selected' : '';
+      return `<div class="rating-btn ${sel}" onclick="rate(${idx},${v})">${v}</div>`;
+    }).join('');
+    return `<div class="question-card"><div class="question-title">Q${idx+1}. ${questions[idx]}</div><div class="rating-row">${btns}</div></div>`;
+  }).join('');
+}
+
+async function rate(idx, score) {
+  ratings[idx] = score;
+  localStorage.setItem('survey_' + myName, JSON.stringify(ratings));
+  renderQuestions();
+  renderDimTabs();
+  updateProgress();
+
+  try {
+    await fetch(API_BASE + '/api/rate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: myName, questionIndex: idx, score })
+    });
+  } catch (e) {
+    console.warn('评分同步失败，稍后���试', e);
+  }
+
+  if (Object.keys(ratings).length === questions.length) {
+    document.getElementById('rating-page').classList.add('hidden');
+    document.getElementById('done-page').classList.remove('hidden');
+  }
+}
+
+function updateProgress() {
+  const total = questions.length;
+  const done = Object.keys(ratings).length;
+  document.getElementById('progress-text').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
+}
+</script>
+</body>
+</html>

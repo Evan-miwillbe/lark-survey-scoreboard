@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+NODE_VERSION="v20.11.0"
+NODE_DIR="/tmp/node-runtime"
+NODE_BIN="$NODE_DIR/bin/node"
+
+if [ ! -f "$NODE_BIN" ]; then
+  echo "Downloading Node.js ${NODE_VERSION}..."
+  mkdir -p "$NODE_DIR"
+  curl -fsSL "https://npmmirror.com/mirrors/node/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.gz" | tar -xz -C "$NODE_DIR" --strip-components=1
+  echo "Node.js installed: $($NODE_BIN --version)"
+fi
+
+cd "$(dirname "$0")"
+exec "$NODE_BIN" src/server.js

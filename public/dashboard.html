@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>实时评分大屏</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{--bg:#0B0F1A;--card:rgba(15,25,50,0.7);--text:#E8ECF1;--muted:#7B8BA3;--high:#00E5A0;--low:#FF6B6B;--mid:#FFD166;--border:rgba(255,255,255,0.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border)}
+.header h1{font-size:1.3rem;font-weight:600}
+.stats{display:flex;gap:24px}
+.stat{text-align:center}
+.stat-val{font-size:1.8rem;font-weight:700;color:var(--high)}
+.stat-label{font-size:0.75rem;color:var(--muted);margin-top:2px}
+.grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px;overflow:hidden}
+.dim-card{background:var(--card);border-radius:10px;padding:12px;border:1px solid var(--border);display:flex;flex-direction:column}
+.dim-title{font-size:0.85rem;font-weight:600;margin-bottom:8px;color:var(--text)}
+.chart-area{flex:1;min-height:0}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>实时评分看板</h1>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="s-registered">0</div><div class="stat-label">参与人数</div></div>
+    <div class="stat"><div class="stat-val" id="s-completed">0</div><div class="stat-label">已完成</div></div>
+    <div class="stat"><div class="stat-val" id="s-ratings">0</div><div class="stat-label">总评分数</div></div>
+    <div class="stat"><div class="stat-val pulse" id="s-live">LIVE</div><div class="stat-label">实时刷新</div></div>
+  </div>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+const API_BASE = window.location.origin;
+let charts = [];
+let dimNames = [];
+
+function getColor(val) {
+  if (val === 0) return 'rgba(255,255,255,0.1)';
+  if (val >= 7) return '#00E5A0';
+  if (val >= 5) return '#FFD166';
+  return '#FF6B6B';
+}
+
+async function init() {
+  const r = await fetch(API_BASE + '/api/questions');
+  const data = await r.json();
+  dimNames = data.dimensions.map(d => d.name);
+
+  const grid = document.getElementById('grid');
+  const rows = Math.ceil(dimNames.length / 3);
+  grid.style.gridTemplateRows = `repeat(${rows},1fr)`;
+
+  dimNames.forEach((name, i) => {
+    const card = document.createElement('div');
+    card.className = 'dim-card';
+    card.innerHTML = `<div class="dim-title">${name}</div><div class="chart-area" id="chart-${i}"></div>`;
+    grid.appendChild(card);
+  });
+
+  dimNames.forEach((_, i) => {
+    const chart = echarts.init(document.getElementById(`chart-${i}`));
+    charts.push(chart);
+  });
+
+  window.addEventListener('resize', () => charts.forEach(c => c.resize()));
+  poll();
+  setInterval(poll, 1000);
+}
+
+async function poll() {
+  try {
+    const r = await fetch(API_BASE + '/api/dashboard');
+    const data = await r.json();
+    updateStats(data.stats);
+    updateCharts(data.dimensions);
+  } catch (e) {
+    console.warn('轮询失败', e);
+  }
+}
+
+function updateStats(stats) {
+  document.getElementById('s-registered').textContent = stats.totalRegistered;
+  document.getElementById('s-completed').textContent = stats.totalCompleted;
+  document.getElementById('s-ratings').textContent = stats.totalRatings;
+}
+
+function updateCharts(dimensions) {
+  dimensions.forEach((dim, i) => {
+    const labels = dim.questions.map(q => 'Q' + (q.index + 1));
+    const values = dim.questions.map(q => q.average);
+    const colors = values.map(getColor);
+
+    charts[i].setOption({
+      grid: { left: 40, right: 12, top: 8, bottom: 20 },
+      xAxis: { type: 'category', data: labels, axisLabel: { color: '#7B8BA3', fontSize: 10 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      yAxis: { type: 'value', min: 0, max: 10, splitNumber: 5, axisLabel: { color: '#7B8BA3', fontSize: 10 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+      series: [{
+        type: 'bar',
+        data: values.map((v, j) => ({ value: v, itemStyle: { color: colors[j], borderRadius: [3, 3, 0, 0] } })),
+        barMaxWidth: 28,
+        label: { show: true, position: 'top', color: '#E8ECF1', fontSize: 10, formatter: p => p.value > 0 ? p.value.toFixed(1) : '' }
+      }],
+      animation: true,
+      animationDuration: 300
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>
