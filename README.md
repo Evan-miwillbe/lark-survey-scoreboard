@@ -32,7 +32,7 @@
 
 然后它自己跑完了：
 
-> **飞书妙记** → AI分析内容，提取主题维度 → 自动创建Base+表单 → 实时收集手机评分 → AI生成分析报告
+![业务流程图](docs/business_flow_diagram.svg)
 
 全程无需人工编写题目、无需手动分析数据。AI读完内容，自己决定该评什么。
 
@@ -88,12 +88,7 @@ npm start
 
 ## 架构
 
-| 层 | 组件 | 技术 | 部署 |
-|:---:|------|------|------|
-| 手机端 | rating.html | localStorage 断点续填 | GitHub Pages（免费） |
-| 服务端 | Express + feishu.js | 内存缓存，毫秒级响应 | 阿里云FC3（免费额度） |
-| 大屏端 | dashboard.html | ECharts 多维度图表 | GitHub Pages（免费） |
-| 数据层 | 飞书 Open API | 认证+读写，50000行免费 | 飞书Base |
+![技术架构图](docs/tech_architecture_diagram.svg)
 
 **数据流向**：手机 `POST /api/rate`（逐题写入）→ 服务端 → 飞书Base ← 服务端 ← 大屏 `GET /api/dashboard`（每秒轮询）
 
