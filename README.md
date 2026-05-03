@@ -32,12 +32,11 @@
 
 然后它自己跑完了：
 
-```mermaid
-graph LR
-    A[飞书妙记<br/>会议记录] --> B[AI分析内容<br/>提取主题维度]
-    B --> C[自动创建<br/>Base+表单]
-    C --> D[实时收集<br/>手机评分]
-    D --> E[AI分析<br/>生成报告]
+```
+┌────────────┐     ┌──────────────┐     ┌───────────┐     ┌──────────┐     ┌──────────┐
+│ 飞书妙记   │ ──→ │ AI分析内容   │ ──→ │ 自动创建  │ ──→ │ 实时收集 │ ──→ │ AI分析   │
+│ (会议记录) │     │ 提取主题维度 │     │ Base+表单 │     │ 手机评分 │     │ 生成报告 │
+└────────────┘     └──────────────┘     └───────────┘     └──────────┘     └──────────┘
 ```
 
 全程无需人工编写题目、无需手动分析数据。AI读完内容，自己决定该评什么。
@@ -94,29 +93,17 @@ npm start
 
 ## 架构
 
-```mermaid
-graph TB
-    subgraph 手机浏览器["📱 手机浏览器（GitHub Pages 免费托管）"]
-        A[rating.html<br/>localStorage 断点续填]
-    end
-
-    subgraph 云端["☁️ 云端（阿里云FC3 免费额度）"]
-        B[Express server]
-        B2[feishu.js 认证+读写]
-    end
-
-    subgraph 大屏浏览器["🖥️ 大屏浏览器（GitHub Pages 免费托管）"]
-        C[dashboard.html<br/>ECharts 多维度图表]
-    end
-
-    subgraph 数据层["💾 数据层（飞书Base 免费50000行）"]
-        D[(飞书 Open API)]
-    end
-
-    A -->|"POST /api/rate（逐题实时写入）"| B
-    C -->|"GET /api/dashboard（每秒轮询）"| B
-    B --- B2
-    B2 -->|认证+读写| D
+```
+┌──────────────┐             ┌──────────────┐             ┌──────────────┐
+│ rating.html  │   POST      │   Express    │    GET      │dashboard.html│
+│ localStorage │──────────→  │  feishu.js   │  ←──────────│   ECharts    │
+│ (断点续填)   │ /api/rate   │  (内存缓存)  │  每秒轮询   │ (多维度图表) │
+└──────────────┘             └──────────────┘             └──────────────┘
+  GitHub Pages                  阿里云 FC3                  GitHub Pages
+ (免费静态托管)              (免费Serverless)             (免费静态托管)
+                                    │
+                              飞书 Open API
+                               (认证+读写)
 ```
 
 **零成本组合**：GitHub Pages（前端）+ 阿里云FC3（后端，免费额度）+ 飞书Base（数据库）= ¥0
