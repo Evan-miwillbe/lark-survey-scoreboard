@@ -81,27 +81,31 @@ npm start
 ## 架构
 
 ```mermaid
-graph LR
-    subgraph 手机浏览器
-        A[rating.html<br/>localStorage]
-    end
-    subgraph 云端
-        B[Express server<br/>feishu.js]
-    end
-    subgraph 大屏浏览器
-        C[dashboard.html<br/>ECharts]
+graph TB
+    subgraph 手机浏览器["📱 手机浏览器（GitHub Pages 免费托管）"]
+        A[rating.html<br/>localStorage 断点续填]
     end
 
-    A -->|POST /api/rate<br/>逐题实时写入| B
-    C -->|GET /api/dashboard<br/>每秒轮询| B
-    B -->|读写| D[(飞书 Open API)]
+    subgraph 云端["☁️ 云端（阿里云FC3 免费额度）"]
+        B[Express server]
+        B2[feishu.js 认证+读写]
+    end
 
-    style A fill:#1a1a2e,color:#fff
-    style B fill:#16213e,color:#fff
-    style C fill:#0f3460,color:#fff
+    subgraph 大屏浏览器["🖥️ 大屏浏览器（GitHub Pages 免费托管）"]
+        C[dashboard.html<br/>ECharts 多维度图表]
+    end
+
+    subgraph 数据层["💾 数据层（飞书Base 免费50000行）"]
+        D[(飞书 Open API)]
+    end
+
+    A -->|"POST /api/rate（逐题实时写入）"| B
+    C -->|"GET /api/dashboard（每秒轮询）"| B
+    B --- B2
+    B2 -->|认证+读写| D
 ```
 
-**零成本部署**：GitHub Pages（前端）+ 阿里云FC3（后端，免费额度）+ 飞书Base（数据库）= ¥0
+**零成本组合**：GitHub Pages（前端）+ 阿里云FC3（后端，免费额度）+ 飞书Base（数据库）= ¥0
 
 ## 项目结构
 
