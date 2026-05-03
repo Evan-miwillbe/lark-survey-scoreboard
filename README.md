@@ -80,21 +80,28 @@ npm start
 
 ## 架构
 
-```
-手机浏览器                    云端                           大屏浏览器
-┌──────────┐    POST /api/rate    ┌──────────┐    GET /api/dashboard    ┌──────────┐
-│ rating   │ ──────────────────→ │ Express  │ ←──── 每秒轮询 ────────  │ dashboard│
-│ .html    │    (逐题实时写入)     │ server   │                         │ .html    │
-│          │                     │          │                         │ ECharts  │
-│ localStorage│                  │ feishu.js│                         │ 多维度图表│
-└──────────┘                     └──────────┘                         └──────────┘
-     ↑                              ↑    ↑
-     │                              │    │
-  GitHub Pages              飞书 Open API   阿里云 FC3
-  (免费静态托管)             (认证+读写)     (免费 Serverless)
+```mermaid
+graph LR
+    subgraph 手机浏览器
+        A[rating.html<br/>localStorage]
+    end
+    subgraph 云端
+        B[Express server<br/>feishu.js]
+    end
+    subgraph 大屏浏览器
+        C[dashboard.html<br/>ECharts]
+    end
+
+    A -->|POST /api/rate<br/>逐题实时写入| B
+    C -->|GET /api/dashboard<br/>每秒轮询| B
+    B -->|读写| D[(飞书 Open API)]
+
+    style A fill:#1a1a2e,color:#fff
+    style B fill:#16213e,color:#fff
+    style C fill:#0f3460,color:#fff
 ```
 
-**零成本组合**：GitHub Pages（前端）+ 阿里云FC3（后端，免费额度）+ 飞书Base（数据库）= ¥0
+**零成本部署**：GitHub Pages（前端）+ 阿里云FC3（后端，免费额度）+ 飞书Base（数据库）= ¥0
 
 ## 项目结构
 
