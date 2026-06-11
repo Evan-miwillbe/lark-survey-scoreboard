@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>诚信销售技能盘点入口</title>
+<title>诚信销售能力实时评估入口</title>
 <style>
 :root {
   --bg: #f4f6f8;
@@ -72,7 +72,7 @@ a.primary {
 </head>
 <body>
 <main class="panel">
-  <h1 id="title">诚信销售技能盘点</h1>
+  <h1 id="title">诚信销售能力实时评估</h1>
   <div class="sub">现场填写使用飞书问卷，本页面只提供入口和看板跳转。</div>
   <div class="actions">
     <a class="primary" id="form-link" target="_blank" rel="noopener">打开飞书问卷</a>
@@ -110,7 +110,7 @@ if (needsApiConfig()) {
   fetch(apiUrl('/api/questions'))
     .then((res) => res.json())
     .then((data) => {
-      document.getElementById('title').textContent = data.title || '诚信销售技能盘点';
+      document.getElementById('title').textContent = data.title || '诚信销售能力实时评估';
       document.getElementById('form-link').href = data.formUrl || '#';
     })
     .catch(() => {

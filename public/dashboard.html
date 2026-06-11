@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>诚信销售技能盘点现场看板</title>
+<title>诚信销售能力实时评估大屏</title>
 <style>
 :root {
   --bg: #f4f6f8;
@@ -375,6 +375,10 @@ h1 {
   align-items: center;
   min-height: 30px;
 }
+.person-card.pending .person-label,
+.person-card.pending .progress-value {
+  color: var(--muted);
+}
 .empty {
   display: grid;
   min-height: 160px;
@@ -414,7 +418,7 @@ h1 {
 <body>
 <header class="topbar">
   <div class="title-wrap">
-    <h1 id="title">诚信销售技能盘点现场看板</h1>
+    <h1 id="title">诚信销售能力实时评估大屏</h1>
     <div class="subtitle" id="subtitle">等待飞书问卷提交</div>
   </div>
   <div class="actions">
@@ -540,7 +544,7 @@ async function loadQuestions() {
   }
   const res = await fetch(apiUrl('/api/questions'));
   const data = await res.json();
-  els.title.textContent = data.title || '诚信销售技能盘点现场看板';
+  els.title.textContent = data.title || '诚信销售能力实时评估大屏';
   els.formLink.href = data.formUrl || '#';
   els.subtitle.textContent = `${data.dimensions.length} 个板块，${data.questions.length} 题，飞书问卷提交后自动刷新`;
 }
@@ -638,18 +642,23 @@ function matchingPeople() {
   });
 }
 
-function ensureSelection() {
-  const people = matchingPeople();
+function ensureSelection(people) {
   if (state.selectedKey && people.some((person) => person.key === state.selectedKey)) return;
   state.selectedKey = people[0] ? people[0].key : '';
 }
 
 function renderPersonLookup() {
   const people = matchingPeople();
-  ensureSelection();
+  const hasKeyword = Boolean(state.search.trim());
+  if (!hasKeyword && !state.selectedKey) {
+    renderMatches(people);
+    renderPerson(null, '输入姓名、手机号或部门后，会直接显示匹配人员的 12 个板块平均分。');
+    return;
+  }
+  ensureSelection(people);
   renderMatches(people);
   const selected = allPeople().find((person) => person.key === state.selectedKey) || people[0] || null;
-  renderPerson(selected);
+  renderPerson(selected, people.length ? '' : '没有找到匹配人员。');
 }
 
 function renderMatches(people) {
@@ -681,20 +690,21 @@ function renderMatches(people) {
   });
 }
 
-function renderPerson(person) {
+function renderPerson(person, message = '') {
   if (!person) {
-    els.personCard.innerHTML = '<div class="empty">输入姓名后，这里会显示该人员 12 个板块平均分。</div>';
+    renderPersonPlaceholder(message);
     return;
   }
 
+  els.personCard.classList.remove('pending');
   const dimensions = state.data.dimensions;
-  const themeRows = person.themes.map((theme) => {
-    const dimension = dimensions.find((item) => item.id === theme.id || item.number === theme.number);
-    const value = Number(theme.average || 0);
+  const themeRows = dimensions.map((dimension) => {
+    const theme = (person.themes || []).find((item) => item.id === dimension.id || item.number === dimension.number);
+    const value = Number((theme && theme.average) || 0);
     const tooltip = buildPersonThemeTooltip(person, theme, dimension);
     return `
       <div class="person-theme tooltip-host" data-tooltip="${escapeAttr(tooltip)}">
-        <div class="person-label">${escapeHtml(theme.shortName || theme.name)}</div>
+        <div class="person-label">${escapeHtml((theme && theme.shortName) || dimension.shortName || (theme && theme.name) || dimension.name)}</div>
         <div class="progress-track">
           <div class="progress-fill" style="width:${barWidth(value)}%;background:${chartColor(value)}"></div>
         </div>
@@ -723,7 +733,43 @@ function renderPerson(person) {
   `;
 }
 
+function renderPersonPlaceholder(message) {
+  const dimensions = state.data ? state.data.dimensions : [];
+  const themeRows = dimensions.map((dimension) => `
+    <div class="person-theme" data-theme="${escapeAttr(dimension.id || dimension.number)}">
+      <div class="person-label">${escapeHtml(dimension.shortName || dimension.name)}</div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:0%;background:#cfd7e3"></div>
+      </div>
+      <div class="progress-value">-</div>
+    </div>
+  `).join('');
+
+  els.personCard.classList.add('pending');
+  els.personCard.innerHTML = `
+    <div class="person-head">
+      <div>
+        <div class="person-name">等待查询</div>
+        <div class="person-meta">${escapeHtml(message || '输入姓名后，这里会显示该人员 12 个板块平均分。')}</div>
+      </div>
+      <div class="person-average">
+        <strong>-</strong>
+        <span>个人总均分</span>
+      </div>
+    </div>
+    <div class="person-stats">
+      <div class="mini"><span>完成</span><strong>-</strong></div>
+      <div class="mini"><span>总分</span><strong>-</strong></div>
+      <div class="mini"><span>最近提交</span><strong>-</strong></div>
+    </div>
+    <div class="person-theme-bars">${themeRows || '<div class="empty">正在加载 12 个板块。</div>'}</div>
+  `;
+}
+
 function buildPersonThemeTooltip(person, theme, dimension) {
+  if (!theme) {
+    return `${dimension.name}：暂无分数`;
+  }
   const lines = [
     `${theme.name}：平均分 ${formatNumber(theme.average)} / 10，总分 ${theme.total} / ${theme.fullScore}`,
   ];
