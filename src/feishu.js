@@ -17,6 +17,7 @@ let appSecret = '';
 let tenantAccessToken = '';
 let tokenExpiresAt = 0;
 let initialized = false;
+let userAccessToken = '';
 
 function readCredentials() {
   appId = process.env.FEISHU_APP_ID || '';
@@ -62,6 +63,12 @@ async function fetchTenantAccessToken() {
 }
 
 async function ensureToken() {
+  // Prefer user access token if provided (has user-level permissions)
+  userAccessToken = process.env.FEISHU_USER_ACCESS_TOKEN || '';
+  if (userAccessToken) {
+    tenantAccessToken = userAccessToken;
+    return;
+  }
   if (!tenantAccessToken || Date.now() >= tokenExpiresAt - TOKEN_REFRESH_MARGIN_MS) {
     await fetchTenantAccessToken();
   }
@@ -140,8 +147,59 @@ async function listAllRecords() {
   return allRecords;
 }
 
+async function createRecord(fields) {
+  await ensureInit();
+  const data = await apiRequest('POST',
+    `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records`,
+    { fields }
+  );
+  if (data.code !== 0) {
+    throw new Error(`create record failed: code=${data.code}, msg=${data.msg}`);
+  }
+  return data.data.record;
+}
+
+async function updateRecord(recordId, fields) {
+  await ensureInit();
+  const data = await apiRequest('PUT',
+    `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records/${recordId}`,
+    { fields }
+  );
+  if (data.code !== 0) {
+    throw new Error(`update record failed: code=${data.code}, msg=${data.msg}`);
+  }
+  return data.data.record;
+}
+
+async function searchRecord(fieldName, value) {
+  await ensureInit();
+  const filter = `CurrentValue.[${fieldName}]="${value.replace(/"/g, '\\"')}"`;
+  const url = `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records?page_size=10&filter=${encodeURIComponent(filter)}`;
+  const data = await apiRequest('GET', url);
+  if (data.code !== 0) {
+    throw new Error(`search record failed: code=${data.code}, msg=${data.msg}`);
+  }
+  const items = (data.data && data.data.items) || [];
+  return items.map(normalizeRecord);
+}
+
+async function getRecord(recordId) {
+  await ensureInit();
+  const data = await apiRequest('GET',
+    `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records/${recordId}`
+  );
+  if (data.code !== 0) {
+    throw new Error(`get record failed: code=${data.code}, msg=${data.msg}`);
+  }
+  return normalizeRecord(data.data.record);
+}
+
 module.exports = {
   init,
   ensureInit,
   listAllRecords,
+  createRecord,
+  updateRecord,
+  searchRecord,
+  getRecord,
 };

@@ -88,12 +88,122 @@ async function broadcastIfChanged(force = false) {
   }
 }
 
-app.all(['/api/register', '/api/rate', '/api/sync'], (req, res) => {
-  res.status(410).json({
-    ok: false,
-    error: '请使用飞书问卷填写；本地服务只负责实时看板和统计。',
-    formUrl: FORM_URL,
-  });
+app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
+  try {
+    await feishu.ensureInit();
+    const { IDENTITY_FIELDS, FIELD_NAMES, SCORE_MAX } = require('./questions');
+
+    // --- /api/register ---
+    if (req.path === '/api/register' && req.method === 'POST') {
+      const name = (req.body.name || '').trim();
+      const phone = (req.body.phone || '').trim().replace(/[^\d+]/g, '');
+      const department = (req.body.department || '').trim();
+
+      if (!name) {
+        return res.status(400).json({ ok: false, error: '请填写姓名' });
+      }
+
+      // Search for existing record by name
+      let match = null;
+      try {
+        const existing = await feishu.searchRecord(IDENTITY_FIELDS.name, name);
+        match = existing.find((r) => {
+          const rPhone = String((r.fields[IDENTITY_FIELDS.phone] || '')).replace(/[^\d+]/g, '');
+          return rPhone === phone || !phone;
+        });
+      } catch (e) {
+        console.warn('[search record failed, will create new]', e.message);
+      }
+
+      if (match) {
+        const scores = {};
+        for (let i = 0; i < FIELD_NAMES.length; i++) {
+          const val = match.fields[FIELD_NAMES[i]];
+          if (val !== undefined && val !== null && val !== '') scores[i] = Number(val);
+        }
+        return res.json({
+          ok: true,
+          recordId: match.record_id,
+          name: match.fields[IDENTITY_FIELDS.name] || name,
+          phone: match.fields[IDENTITY_FIELDS.phone] || phone,
+          department: match.fields[IDENTITY_FIELDS.department] || department,
+          scores,
+          isNew: false,
+        });
+      }
+
+      // Create new record
+      const fields = {
+        [IDENTITY_FIELDS.name]: name,
+        [IDENTITY_FIELDS.phone]: phone,
+        [IDENTITY_FIELDS.department]: department,
+      };
+      const record = await feishu.createRecord(fields);
+      await refreshCache(true);
+
+      return res.json({
+        ok: true,
+        recordId: record.record_id,
+        name,
+        phone,
+        department,
+        scores: {},
+        isNew: true,
+      });
+    }
+
+    // --- /api/rate ---
+    if (req.path === '/api/rate' && req.method === 'POST') {
+      const recordId = (req.body.recordId || '').trim();
+      const questionIndex = Number(req.body.questionIndex);
+      const value = Number(req.body.value);
+
+      if (!recordId) {
+        return res.status(400).json({ ok: false, error: '缺少 recordId' });
+      }
+      if (!Number.isFinite(questionIndex) || questionIndex < 0 || questionIndex >= FIELD_NAMES.length) {
+        return res.status(400).json({ ok: false, error: `题目序号无效: ${questionIndex}` });
+      }
+      if (!Number.isFinite(value) || value < 1 || value > SCORE_MAX) {
+        return res.status(400).json({ ok: false, error: `分数无效: ${value}，范围 1-${SCORE_MAX}` });
+      }
+
+      const fieldName = FIELD_NAMES[questionIndex];
+      await feishu.updateRecord(recordId, { [fieldName]: value });
+      await refreshCache(true);
+
+      return res.json({ ok: true, questionIndex, value });
+    }
+
+    // --- /api/sync ---
+    if (req.path === '/api/sync' && (req.method === 'GET' || req.method === 'POST')) {
+      const recordId = (req.method === 'POST' ? req.body.recordId : req.query.recordId || '').trim();
+      if (!recordId) {
+        return res.status(400).json({ ok: false, error: '缺少 recordId' });
+      }
+
+      const record = await feishu.getRecord(recordId);
+      const scores = {};
+      for (let i = 0; i < FIELD_NAMES.length; i++) {
+        const val = record.fields[FIELD_NAMES[i]];
+        if (val !== undefined && val !== null && val !== '') scores[i] = Number(val);
+      }
+
+      return res.json({
+        ok: true,
+        recordId: record.record_id,
+        name: record.fields[IDENTITY_FIELDS.name] || '',
+        phone: record.fields[IDENTITY_FIELDS.phone] || '',
+        department: record.fields[IDENTITY_FIELDS.department] || '',
+        scores,
+      });
+    }
+
+    res.status(405).json({ ok: false, error: 'Method not allowed' });
+  } catch (error) {
+    console.error('[api error]', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
 });
 
 app.get('/api/questions', (req, res) => {

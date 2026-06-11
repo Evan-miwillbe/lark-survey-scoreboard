@@ -2,121 +2,449 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>诚信销售能力实时评估入口</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>诚信销售能力评估 - 逐题评分</title>
 <style>
 :root {
+  --blue: #2563eb;
+  --green: #0e9f6e;
+  --amber: #f59e0b;
+  --rose: #e11d48;
   --bg: #f4f6f8;
-  --panel: #ffffff;
+  --panel: #fff;
   --ink: #172033;
   --muted: #667085;
   --line: #d7dde6;
-  --blue: #2563eb;
-  --shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  --soft: #edf1f6;
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-.panel {
-  width: min(520px, calc(100vw - 28px));
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  padding: 22px;
-}
-h1 {
-  margin: 0 0 8px;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-.sub {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 18px;
-}
-a {
-  min-height: 44px;
-  display: inline-flex;
+/* Identity screen */
+.identity-screen {
+  min-height: 100vh;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 800;
+  padding: 16px;
 }
-a.primary {
-  border-color: var(--blue);
-  background: var(--blue);
-  color: #fff;
+.identity-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 4px 20px rgba(15,23,42,0.08);
 }
-@media (max-width: 520px) {
-  .actions { grid-template-columns: 1fr; }
+.identity-card h2 { font-size: 20px; margin-bottom: 6px; }
+.identity-card .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #344054; }
+.form-group input {
+  width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 8px;
+  padding: 0 12px; font-size: 15px; color: var(--ink); background: #fff;
 }
+.form-group input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.btn-start {
+  width: 100%; height: 48px; border: none; border-radius: 8px;
+  background: var(--blue); color: #fff; font-size: 16px; font-weight: 800;
+  cursor: pointer; margin-top: 8px;
+}
+.btn-start:disabled { opacity: 0.5; }
+.note { margin-top: 10px; color: var(--muted); font-size: 12px; text-align: center; }
+
+/* Main scoring screen */
+.scoring-screen { display: none; flex-direction: column; min-height: 100vh; max-height: 100vh; }
+.scoring-screen.active { display: flex; }
+.topbar-fixed {
+  flex: 0 0 auto; background: var(--panel); border-bottom: 1px solid var(--line);
+  padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+}
+.topbar-fixed h3 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress-badge {
+  flex: 0 0 auto; background: var(--blue); color: #fff; border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; font-weight: 800; white-space: nowrap;
+}
+.theme-tabs {
+  flex: 0 0 auto; display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.theme-tabs::-webkit-scrollbar { display: none; }
+.theme-tab {
+  flex: 0 0 auto; padding: 6px 12px; border-radius: 16px; border: 1px solid var(--line);
+  background: #fff; color: var(--ink); font-size: 12px; font-weight: 700;
+  white-space: nowrap; cursor: pointer; transition: all 120ms;
+}
+.theme-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.theme-tab.done { border-color: var(--green); color: var(--green); }
+.theme-tab.done.active { background: var(--green); color: #fff; border-color: var(--green); }
+.questions-scroll {
+  flex: 1 1 auto; overflow-y: auto; padding: 8px 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.question-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px; margin-bottom: 8px; transition: border-color 200ms;
+}
+.question-card.answered { border-color: var(--green); background: #f0fdf6; }
+.question-card .q-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.question-card .q-num { font-size: 11px; font-weight: 900; color: var(--muted); flex: 0 0 auto; }
+.question-card .q-text { font-size: 13px; line-height: 1.4; flex: 1 1 auto; }
+.question-card .q-score {
+  flex: 0 0 auto; font-size: 18px; font-weight: 900; min-width: 28px; text-align: center;
+}
+.rating-buttons {
+  display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap;
+}
+.rating-btn {
+  flex: 1 1 auto; min-width: 28px; height: 34px; border-radius: 6px; border: 1px solid var(--line);
+  background: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+  color: var(--ink); transition: all 100ms;
+}
+.rating-btn:active { transform: scale(0.95); }
+.rating-btn.selected {
+  background: var(--blue); color: #fff; border-color: var(--blue);
+}
+.rating-btn:hover { background: var(--soft); }
+.rating-btn.selected:hover { background: var(--blue); }
+.empty-questions {
+  display: grid; place-items: center; min-height: 200px; color: var(--muted); font-size: 14px;
+}
+.bottom-bar {
+  flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--line);
+  padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+}
+.bottom-bar .total-label { font-size: 13px; color: var(--muted); }
+.bottom-bar .total-score { font-size: 22px; font-weight: 900; }
+.bottom-bar .logout-btn {
+  background: none; border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; color: var(--muted); cursor: pointer;
+}
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 100;
+  background: rgba(17,24,39,0.9); color: #fff; padding: 8px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; pointer-events: none; opacity: 0; transition: opacity 200ms;
+}
+.toast.show { opacity: 1; }
+.syncing { opacity: 0.5; pointer-events: none; }
 </style>
 </head>
 <body>
-<main class="panel">
-  <h1 id="title">诚信销售能力实时评估</h1>
-  <div class="sub">现场填写使用飞书问卷，本页面只提供入口和看板跳转。</div>
-  <div class="actions">
-    <a class="primary" id="form-link" target="_blank" rel="noopener">打开飞书问卷</a>
-    <a href="/dashboard.html">打开现场看板</a>
+
+<!-- Identity Screen -->
+<div class="identity-screen" id="identity-screen">
+  <div class="identity-card">
+    <h2 id="survey-title">诚信销售能力评估</h2>
+    <div class="sub">请填写个人信息后开始逐题评分（共120题，12个板块）</div>
+    <div class="form-group">
+      <label>姓名 *</label>
+      <input type="text" id="reg-name" placeholder="请输入您的姓名" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label>手机号</label>
+      <input type="tel" id="reg-phone" placeholder="用于去重，同名时区分" autocomplete="tel">
+    </div>
+    <div class="form-group">
+      <label>部门</label>
+      <input type="text" id="reg-dept" placeholder="可选" autocomplete="organization">
+    </div>
+    <button class="btn-start" id="btn-start" onclick="doRegister()">开始评分</button>
+    <div class="note">120题逐题评分 · 每题点击即时提交 · 可随时退出续填</div>
   </div>
-</main>
+</div>
+
+<!-- Scoring Screen -->
+<div class="scoring-screen" id="scoring-screen">
+  <div class="topbar-fixed">
+    <h3 id="person-name-display">...</h3>
+    <div class="progress-badge" id="progress-badge">0/120</div>
+  </div>
+  <div class="theme-tabs" id="theme-tabs"></div>
+  <div class="questions-scroll" id="questions-scroll"></div>
+  <div class="bottom-bar">
+    <div>
+      <div class="total-label">当前总分</div>
+      <div class="total-score" id="total-score">0</div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">退出</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script src="./config.js"></script>
 <script>
-const API_BASE = resolveApiBase();
-
-function resolveApiBase() {
+const API_BASE = (() => {
   const params = new URLSearchParams(window.location.search);
-  const fromQuery = params.get('api');
-  if (fromQuery) {
-    const normalized = fromQuery.replace(/\/+$/, '');
-    localStorage.setItem('scoreboardApiBase', normalized);
-    return normalized;
-  }
-  const configured = window.SCOREBOARD_API_BASE || localStorage.getItem('scoreboardApiBase') || '';
-  return configured.replace(/\/+$/, '');
+  const q = params.get('api');
+  if (q) { localStorage.setItem('scoreboardApiBase', q.replace(/\/+$/,'')); return q.replace(/\/+$/,''); }
+  const c = (window.SCOREBOARD_API_BASE || localStorage.getItem('scoreboardApiBase') || '').replace(/\/+$/,'');
+  return c;
+})();
+const api = (p) => `${API_BASE}${p}`;
+const STORAGE_KEY = 'scoreboard_session';
+
+let state = {
+  recordId: '',
+  name: '', phone: '', department: '',
+  scores: {},     // {questionIndex: value}
+  dimensions: [], // from /api/questions
+  currentTheme: 0,
+};
+
+// ─── Toast ───
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1500);
 }
 
-function apiUrl(path) {
-  return `${API_BASE}${path}`;
+// ─── Persistence ───
+function saveSession() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    recordId: state.recordId, name: state.name,
+    phone: state.phone, department: state.department,
+    scores: state.scores,
+  }));
 }
+function clearSession() { localStorage.removeItem(STORAGE_KEY); }
 
-function needsApiConfig() {
-  return !API_BASE && /\.github\.io$/i.test(window.location.hostname);
-}
+// ─── Register ───
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const dept = document.getElementById('reg-dept').value.trim();
+  if (!name) { showToast('请填写姓名'); return; }
 
-if (needsApiConfig()) {
-  document.querySelector('.sub').textContent = '请先在 public/config.js 设置 FC3 API 地址，或在 URL 后加 ?api=你的FC3地址。';
-  document.getElementById('form-link').href = '#';
-} else {
-  fetch(apiUrl('/api/questions'))
-    .then((res) => res.json())
-    .then((data) => {
-      document.getElementById('title').textContent = data.title || '诚信销售能力实时评估';
-      document.getElementById('form-link').href = data.formUrl || '#';
-    })
-    .catch(() => {
-      document.getElementById('form-link').href = '#';
+  const btn = document.getElementById('btn-start');
+  btn.disabled = true; btn.textContent = '连接中...';
+
+  try {
+    const res = await fetch(api('/api/register'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, department: dept }),
     });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+
+    state.recordId = data.recordId;
+    state.name = data.name;
+    state.phone = data.phone;
+    state.department = data.department;
+    state.scores = data.scores || {};
+    state.currentTheme = 0;
+
+    if (!data.isNew) {
+      showToast(`欢迎回来！已恢复 ${Object.keys(state.scores).length} 题`);
+    }
+
+    await loadDimensions();
+    saveSession();
+    showScoringScreen();
+  } catch (e) {
+    showToast('连接失败: ' + e.message);
+    btn.disabled = false; btn.textContent = '开始评分';
+  }
 }
+
+// ─── Load config ───
+async function loadDimensions() {
+  try {
+    const res = await fetch(api('/api/questions'));
+    const data = await res.json();
+    const allQuestions = data.questions || [];
+    state.dimensions = (data.dimensions || []).map((dim) => ({
+      id: dim.id, number: dim.number, name: dim.name, shortName: dim.shortName,
+      questionIndices: dim.questionIndices, questionNumbers: dim.questionNumbers,
+      questions: dim.questionIndices.map((idx, i) => ({
+        index: idx,
+        number: dim.questionNumbers ? dim.questionNumbers[i] : (idx + 1),
+        text: allQuestions[idx] ? allQuestions[idx].text : `题目 ${idx + 1}`,
+      })),
+    }));
+    document.getElementById('survey-title').textContent = data.title || '诚信销售能力评估';
+  } catch (e) {
+    console.error('Failed to load questions config', e);
+  }
+}
+
+// ─── Switch screens ───
+function showScoringScreen() {
+  document.getElementById('identity-screen').style.display = 'none';
+  document.getElementById('scoring-screen').classList.add('active');
+  document.getElementById('person-name-display').textContent = state.name;
+  renderThemeTabs();
+  renderQuestions();
+  updateStats();
+}
+
+function showIdentityScreen() {
+  document.getElementById('identity-screen').style.display = '';
+  document.getElementById('scoring-screen').classList.remove('active');
+}
+
+// ─── Rate ───
+async function doRate(questionIndex, value) {
+  const prev = state.scores[questionIndex];
+  // Optimistic update
+  state.scores[questionIndex] = value;
+  renderQuestions();
+  updateStats();
+  saveSession();
+
+  try {
+    const res = await fetch(api('/api/rate'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId: state.recordId, questionIndex, value }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    // Success - dashboard will pick up via SSE
+  } catch (e) {
+    // Revert on failure
+    if (prev === undefined) delete state.scores[questionIndex];
+    else state.scores[questionIndex] = prev;
+    renderQuestions();
+    updateStats();
+    saveSession();
+    showToast('提交失败，请重试');
+  }
+}
+
+// ─── Render theme tabs ───
+function renderThemeTabs() {
+  const container = document.getElementById('theme-tabs');
+  container.innerHTML = state.dimensions.map((dim, i) => {
+    const questions = dim.questions || dim.questionIndices || [];
+    const answered = questions.filter(q => {
+      const idx = q.index !== undefined ? q.index : (q.number - 1);
+      return state.scores[idx] !== undefined;
+    }).length;
+    const total = questions.length;
+    const allDone = answered === total;
+    return `<div class="theme-tab${i === state.currentTheme ? ' active' : ''}${allDone ? ' done' : ''}"
+      onclick="switchTheme(${i})">${dim.shortName || dim.name} ${answered}/${total}</div>`;
+  }).join('');
+}
+
+function switchTheme(index) {
+  state.currentTheme = index;
+  renderThemeTabs();
+  renderQuestions();
+}
+
+// ─── Render questions ───
+function renderQuestions() {
+  const dim = state.dimensions[state.currentTheme];
+  const container = document.getElementById('questions-scroll');
+
+  if (!dim) {
+    container.innerHTML = '<div class="empty-questions">加载中...</div>';
+    return;
+  }
+
+  const questions = dim.questions || [];
+  if (!questions.length) {
+    container.innerHTML = '<div class="empty-questions">该板块暂无题目</div>';
+    return;
+  }
+
+  container.innerHTML = questions.map(q => {
+    const qIdx = q.index !== undefined ? q.index : (q.number - 1);
+    const currentScore = state.scores[qIdx];
+    const answered = currentScore !== undefined;
+
+    const buttons = [];
+    for (let s = 1; s <= 10; s++) {
+      buttons.push(`<button class="rating-btn${currentScore === s ? ' selected' : ''}"
+        onclick="doRate(${qIdx}, ${s})">${s}</button>`);
+    }
+
+    return `<div class="question-card${answered ? ' answered' : ''}">
+      <div class="q-header">
+        <span class="q-num">Q${String(q.number).padStart(3,'0')}</span>
+        <span class="q-text">${escHtml(q.text || '')}</span>
+        <span class="q-score" style="color:${scoreColor(currentScore)}">${currentScore || '-'}</span>
+      </div>
+      <div class="rating-buttons">${buttons.join('')}</div>
+    </div>`;
+  }).join('');
+
+  // Scroll to top of questions
+  container.scrollTop = 0;
+}
+
+function scoreColor(v) {
+  if (!v) return '#a0aec0';
+  if (v >= 8) return '#0e9f6e';
+  if (v >= 6.5) return '#2563eb';
+  if (v >= 5) return '#f59e0b';
+  return '#e11d48';
+}
+
+function updateStats() {
+  const answered = Object.keys(state.scores).length;
+  let totalScore = 0;
+  for (const v of Object.values(state.scores)) totalScore += v;
+  document.getElementById('progress-badge').textContent = `${answered}/120`;
+  document.getElementById('total-score').textContent = totalScore;
+  document.getElementById('total-score').style.color = scoreColor(answered ? totalScore / answered : 0);
+}
+
+// ─── Logout ───
+function doLogout() {
+  if (confirm('确定退出？已填数据已保存，重新输入姓名即可恢复。')) {
+    clearSession();
+    state = { recordId: '', name: '', phone: '', department: '', scores: {}, dimensions: [], currentTheme: 0 };
+    showIdentityScreen();
+  }
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Init ───
+async function init() {
+  await loadDimensions();
+
+  // Restore session
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const sess = JSON.parse(saved);
+      if (sess.recordId && sess.name) {
+        // Verify session is still valid
+        const res = await fetch(api(`/api/sync?recordId=${encodeURIComponent(sess.recordId)}`));
+        const data = await res.json();
+        if (data.ok) {
+          state.recordId = data.recordId;
+          state.name = data.name;
+          state.phone = data.phone;
+          state.department = data.department;
+          state.scores = data.scores || {};
+          state.currentTheme = 0;
+          showScoringScreen();
+          return;
+        }
+      }
+    } catch (e) { /* session expired, show identity */ }
+    clearSession();
+  }
+}
+
+init();
 </script>
 </body>
 </html>
