@@ -2,170 +2,120 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>实时评分</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>诚信销售技能盘点入口</title>
 <style>
-:root{--primary:#1B2A4A;--accent:#F59E0B;--bg:#FAFAF8;--card:#fff;--text:#1a1a1a;--muted:#888;--border:#e5e5e5}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.container{max-width:420px;margin:0 auto;padding:20px}
-h1{font-size:1.4rem;text-align:center;margin:20px 0;color:var(--primary)}
-.card{background:var(--card);border-radius:12px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-input,select{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-size:1rem;margin:8px 0}
-input:focus,select:focus{outline:none;border-color:var(--accent)}
-.btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:12px}
-.btn:active{opacity:0.8}
-.btn:disabled{background:#ccc;cursor:not-allowed}
-.dim-tabs{display:flex;gap:8px;overflow-x:auto;padding:8px 0;margin:12px 0}
-.dim-tab{flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:0.85rem;cursor:pointer;white-space:nowrap}
-.dim-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.dim-tab .count{font-size:0.75rem;opacity:0.7;margin-left:4px}
-.question-card{background:var(--card);border-radius:12px;padding:16px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.question-title{font-size:0.9rem;margin-bottom:12px;line-height:1.4}
-.rating-row{display:flex;gap:4px;justify-content:center}
-.rating-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.rating-btn.selected{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:bold}
-.progress{text-align:center;color:var(--muted);font-size:0.85rem;margin:16px 0}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;margin:8px 0}
-.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s}
-.hidden{display:none}
-.done-page{text-align:center;padding:40px 20px}
-.done-page h2{font-size:1.5rem;margin-bottom:12px}
-.done-page p{color:var(--muted)}
+:root {
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d7dde6;
+  --blue: #2563eb;
+  --shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+.panel {
+  width: min(520px, calc(100vw - 28px));
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.sub {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 800;
+}
+a.primary {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+@media (max-width: 520px) {
+  .actions { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <!-- 注册 -->
-  <div id="register-page">
-    <h1>评分问卷</h1>
-    <div class="card">
-      <input type="text" id="inp-name" placeholder="请输入您的姓名">
-      <input type="text" id="inp-dept" placeholder="请输入您的部门">
-      <button class="btn" onclick="doRegister()">开始评分</button>
-    </div>
+<main class="panel">
+  <h1 id="title">诚信销售技能盘点</h1>
+  <div class="sub">现场填写使用飞书问卷，本页面只提供入口和看板跳转。</div>
+  <div class="actions">
+    <a class="primary" id="form-link" target="_blank" rel="noopener">打开飞书问卷</a>
+    <a href="/dashboard.html">打开现场看板</a>
   </div>
-
-  <!-- 评分 -->
-  <div id="rating-page" class="hidden">
-    <div class="progress">
-      <span id="progress-text">0 / 0</span>
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    </div>
-    <div class="dim-tabs" id="dim-tabs"></div>
-    <div id="questions-area"></div>
-  </div>
-
-  <!-- 完成 -->
-  <div id="done-page" class="hidden done-page">
-    <h2>评分完成</h2>
-    <p>感谢您的参与！数据已实时同步。</p>
-  </div>
-</div>
-
+</main>
+<script src="./config.js"></script>
 <script>
-const API_BASE = window.location.origin;
+const API_BASE = resolveApiBase();
 
-let questions = [];
-let dimensions = [];
-let myName = '';
-let myDept = '';
-let ratings = {};
-let activeDim = 0;
+function resolveApiBase() {
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get('api');
+  if (fromQuery) {
+    const normalized = fromQuery.replace(/\/+$/, '');
+    localStorage.setItem('scoreboardApiBase', normalized);
+    return normalized;
+  }
+  const configured = window.SCOREBOARD_API_BASE || localStorage.getItem('scoreboardApiBase') || '';
+  return configured.replace(/\/+$/, '');
+}
 
-async function doRegister() {
-  myName = document.getElementById('inp-name').value.trim();
-  myDept = document.getElementById('inp-dept').value.trim();
-  if (!myName || !myDept) return alert('请填写姓名和部门');
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
 
-  const saved = localStorage.getItem('survey_' + myName);
-  if (saved) ratings = JSON.parse(saved);
+function needsApiConfig() {
+  return !API_BASE && /\.github\.io$/i.test(window.location.hostname);
+}
 
-  try {
-    const r = await fetch(API_BASE + '/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: myName, department: myDept })
+if (needsApiConfig()) {
+  document.querySelector('.sub').textContent = '请先在 public/config.js 设置 FC3 API 地址，或在 URL 后加 ?api=你的FC3地址。';
+  document.getElementById('form-link').href = '#';
+} else {
+  fetch(apiUrl('/api/questions'))
+    .then((res) => res.json())
+    .then((data) => {
+      document.getElementById('title').textContent = data.title || '诚信销售技能盘点';
+      document.getElementById('form-link').href = data.formUrl || '#';
+    })
+    .catch(() => {
+      document.getElementById('form-link').href = '#';
     });
-    const data = await r.json();
-    if (!data.ok) return alert(data.error || '注册失败');
-
-    if (data.scores && Object.keys(data.scores).length > 0) {
-      for (const [k, v] of Object.entries(data.scores)) {
-        ratings[k] = v;
-      }
-    }
-  } catch (e) {
-    console.warn('离线模式', e);
-  }
-
-  const qr = await fetch(API_BASE + '/api/questions');
-  const qd = await qr.json();
-  questions = qd.questions;
-  dimensions = qd.dimensions;
-
-  document.getElementById('register-page').classList.add('hidden');
-  document.getElementById('rating-page').classList.remove('hidden');
-  renderDimTabs();
-  renderQuestions();
-  updateProgress();
-}
-
-function renderDimTabs() {
-  const el = document.getElementById('dim-tabs');
-  el.innerHTML = dimensions.map((d, i) => {
-    const done = d.questionIndices.filter(idx => ratings[idx] !== undefined).length;
-    return `<div class="dim-tab ${i === activeDim ? 'active' : ''}" onclick="switchDim(${i})">${d.name}<span class="count">${done}/${d.questionIndices.length}</span></div>`;
-  }).join('');
-}
-
-function switchDim(i) {
-  activeDim = i;
-  renderDimTabs();
-  renderQuestions();
-}
-
-function renderQuestions() {
-  const dim = dimensions[activeDim];
-  const area = document.getElementById('questions-area');
-  area.innerHTML = dim.questionIndices.map(idx => {
-    const btns = Array.from({length: 10}, (_, k) => {
-      const v = k + 1;
-      const sel = ratings[idx] === v ? 'selected' : '';
-      return `<div class="rating-btn ${sel}" onclick="rate(${idx},${v})">${v}</div>`;
-    }).join('');
-    return `<div class="question-card"><div class="question-title">Q${idx+1}. ${questions[idx]}</div><div class="rating-row">${btns}</div></div>`;
-  }).join('');
-}
-
-async function rate(idx, score) {
-  ratings[idx] = score;
-  localStorage.setItem('survey_' + myName, JSON.stringify(ratings));
-  renderQuestions();
-  renderDimTabs();
-  updateProgress();
-
-  try {
-    await fetch(API_BASE + '/api/rate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: myName, questionIndex: idx, score })
-    });
-  } catch (e) {
-    console.warn('评分同步失败，稍后���试', e);
-  }
-
-  if (Object.keys(ratings).length === questions.length) {
-    document.getElementById('rating-page').classList.add('hidden');
-    document.getElementById('done-page').classList.remove('hidden');
-  }
-}
-
-function updateProgress() {
-  const total = questions.length;
-  const done = Object.keys(ratings).length;
-  document.getElementById('progress-text').textContent = `${done} / ${total}`;
-  document.getElementById('progress-fill').style.width = (done / total * 100) + '%';
 }
 </script>
 </body>

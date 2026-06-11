@@ -1,0 +1,43 @@
+edition: 3.0.0
+name: lark-survey-scoreboard
+access: default
+
+vars:
+  region: cn-hangzhou
+
+resources:
+  scoreboard-api:
+    component: fc3
+    props:
+      region: ${vars.region}
+      functionName: lark-survey-scoreboard
+      description: Feishu survey scoreboard API
+      runtime: custom.debian10
+      code: ./
+      handler: dummy
+      memorySize: 512
+      timeout: 60
+      environmentVariables:
+        NODE_ENV: production
+        FEISHU_APP_ID: replace_with_your_feishu_app_id
+        FEISHU_APP_SECRET: replace_with_your_feishu_app_secret
+        FEISHU_BASE_TOKEN: STIKbVfxvaxd4PsvdBKcaQTKnFe
+        FEISHU_TABLE_ID: tbl2uUjvQ4MochWh
+        FEISHU_FORM_ID: vewohSG9xB
+        FEISHU_BASE_URL: https://tcnalhaufj4o.feishu.cn/base/STIKbVfxvaxd4PsvdBKcaQTKnFe
+        FEISHU_FORM_URL: https://tcnalhaufj4o.feishu.cn/base/STIKbVfxvaxd4PsvdBKcaQTKnFe?table=tbl2uUjvQ4MochWh&view=vewohSG9xB
+        CACHE_TTL_MS: "3000"
+        LIVE_POLL_MS: "3000"
+      triggers:
+        - triggerName: httpTrigger
+          triggerType: http
+          triggerConfig:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - HEAD
+              - OPTIONS

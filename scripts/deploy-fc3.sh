@@ -1,31 +1,37 @@
 #!/bin/bash
-# 部署到阿里云 FC3（Serverless）
-# 前提：已安装 @serverless-devs/s 并配置阿里云密钥
+# Deploy the API to Alibaba Cloud FC3.
+# Prerequisites:
+#   1. npm install -g @serverless-devs/s
+#   2. s config add
+#   3. cp s.yaml.example s.yaml and fill FEISHU_APP_ID / FEISHU_APP_SECRET
 
-set -e
+set -euo pipefail
 
-echo "=== 部署到阿里云 FC3 ==="
+echo "=== Deploy API to Alibaba Cloud FC3 ==="
 
-# 检查 s CLI
-if ! command -v s &> /dev/null; then
-  echo "请先安装 Serverless Devs: npm install -g @serverless-devs/s"
+if ! command -v s >/dev/null 2>&1; then
+  echo "Serverless Devs is missing. Install it with: npm install -g @serverless-devs/s"
   exit 1
 fi
 
-# 确保 bootstrap 文件换行符正确
+if [ ! -f s.yaml ]; then
+  echo "Missing s.yaml. Copy s.yaml.example to s.yaml and fill the Feishu credentials first."
+  exit 1
+fi
+
 if [ -f bootstrap ]; then
   sed -i 's/\r$//' bootstrap
 fi
 
-echo "[1/3] 安装依赖..."
-npm install --production
+echo "[1/3] Install production dependencies..."
+npm install --omit=dev
 
-echo "[2/3] 部署函数..."
+echo "[2/3] Deploy function..."
 s deploy
 
-echo "[3/3] 部署完成！"
+echo "[3/3] Done."
 echo ""
-echo "部署后:"
-echo "  1. 修改 public/rating.html 中的 API_BASE 为 FC3 返回的 URL"
-echo "  2. 修改 public/dashboard.html 中的 API_BASE 为同一 URL"
-echo "  3. 推送 public/ 到 GitHub Pages"
+echo "Next:"
+echo "  1. Copy the FC3 HTTP trigger URL from the deploy output."
+echo "  2. Set window.SCOREBOARD_API_BASE in public/config.js to that URL."
+echo "  3. Push public/ to GitHub Pages."

@@ -1,14 +1,16 @@
+require('./env').loadEnv();
+
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-const BASE_TOKEN = process.env.FEISHU_BASE_TOKEN || 'your_base_token';
-const TABLE_ID = process.env.FEISHU_TABLE_ID || 'your_table_id';
-
+const BASE_TOKEN = process.env.FEISHU_BASE_TOKEN || '';
+const TABLE_ID = process.env.FEISHU_TABLE_ID || '';
 const API_BASE = 'https://open.feishu.cn';
 const TOKEN_REFRESH_MARGIN_MS = 5 * 60 * 1000;
 
-const CONFIG_PATH = path.join(require('os').homedir(), '.lark-cli/config.json');
-const SECRET_PATH = path.join(require('os').homedir(), '.lark-cli/appsecret.txt');
+const CONFIG_PATH = path.join(os.homedir(), '.lark-cli', 'config.json');
+const SECRET_PATH = path.join(os.homedir(), '.lark-cli', 'appsecret.txt');
 
 let appId = '';
 let appSecret = '';
@@ -23,12 +25,22 @@ function readCredentials() {
   if (appId && appSecret) return;
 
   try {
-    const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    const config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
     const app = config.apps && config.apps[0];
     if (app && app.appId) appId = app.appId;
-    appSecret = fs.readFileSync(SECRET_PATH, 'utf-8').trim();
+    if (!appSecret) appSecret = fs.readFileSync(SECRET_PATH, 'utf8').trim();
   } catch (e) {
-    throw new Error('无法读取飞书凭据：请设置环境变量或在本地运行 lark-cli login');
+    throw new Error('Unable to read Feishu credentials. Run lark-cli login or set FEISHU_APP_ID/FEISHU_APP_SECRET.');
+  }
+
+  if (!appId || !appSecret) {
+    throw new Error('Missing FEISHU_APP_ID or FEISHU_APP_SECRET.');
+  }
+}
+
+function ensureBaseConfig() {
+  if (!BASE_TOKEN || !TABLE_ID) {
+    throw new Error('Missing FEISHU_BASE_TOKEN or FEISHU_TABLE_ID.');
   }
 }
 
@@ -42,7 +54,7 @@ async function fetchTenantAccessToken() {
 
   const data = await res.json();
   if (data.code !== 0) {
-    throw new Error(`获取 token 失败: code=${data.code}, msg=${data.msg}`);
+    throw new Error(`tenant_access_token failed: code=${data.code}, msg=${data.msg}`);
   }
 
   tenantAccessToken = data.tenant_access_token;
@@ -62,20 +74,18 @@ async function apiRequest(method, urlPath, body) {
   const options = {
     method,
     headers: {
-      'Authorization': `Bearer ${tenantAccessToken}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${tenantAccessToken}`,
+      'Content-Type': 'application/json; charset=utf-8',
     },
   };
-  if (body !== undefined) {
-    options.body = JSON.stringify(body);
-  }
+  if (body !== undefined) options.body = JSON.stringify(body);
 
   let res = await fetch(fullUrl, options);
   let data = await res.json();
 
   if (res.status === 401 || data.code === 99991663 || data.code === 99991668) {
     await fetchTenantAccessToken();
-    options.headers['Authorization'] = `Bearer ${tenantAccessToken}`;
+    options.headers.Authorization = `Bearer ${tenantAccessToken}`;
     res = await fetch(fullUrl, options);
     data = await res.json();
   }
@@ -85,6 +95,7 @@ async function apiRequest(method, urlPath, body) {
 
 async function init() {
   if (initialized) return;
+  ensureBaseConfig();
   readCredentials();
   await fetchTenantAccessToken();
   initialized = true;
@@ -95,24 +106,32 @@ async function ensureInit() {
   await ensureToken();
 }
 
+function normalizeRecord(item) {
+  return {
+    record_id: item.record_id,
+    fields: item.fields || {},
+    created_time: item.created_time,
+    last_modified_time: item.last_modified_time,
+    created_by: item.created_by,
+    last_modified_by: item.last_modified_by,
+  };
+}
+
 async function listAllRecords() {
   const allRecords = [];
-  let pageToken = undefined;
+  let pageToken;
 
   do {
     let url = `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records?page_size=500`;
-    if (pageToken) url += `&page_token=${pageToken}`;
+    if (pageToken) url += `&page_token=${encodeURIComponent(pageToken)}`;
 
     const data = await apiRequest('GET', url);
     if (data.code !== 0) {
-      console.error('listAllRecords error:', data.code, data.msg);
-      return null;
+      throw new Error(`list records failed: code=${data.code}, msg=${data.msg}`);
     }
 
     const items = (data.data && data.data.items) || [];
-    for (const item of items) {
-      allRecords.push({ record_id: item.record_id, fields: item.fields });
-    }
+    for (const item of items) allRecords.push(normalizeRecord(item));
 
     const hasMore = data.data && data.data.has_more;
     pageToken = hasMore ? data.data.page_token : undefined;
@@ -121,32 +140,8 @@ async function listAllRecords() {
   return allRecords;
 }
 
-async function createRecord(fields) {
-  const url = `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records`;
-  const data = await apiRequest('POST', url, { fields });
-
-  if (data.code !== 0) {
-    console.error('createRecord error:', data.code, data.msg);
-    return null;
-  }
-
-  const rec = data.data && data.data.record;
-  return { record_id: rec.record_id, fields: rec.fields };
-}
-
-async function updateRecord(recordId, fields) {
-  const url = `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records/${recordId}`;
-  const data = await apiRequest('PUT', url, { fields });
-
-  if (data.code !== 0) {
-    throw new Error(`updateRecord error: ${data.code} ${data.msg}`);
-  }
-
-  const rec = data.data && data.data.record;
-  return { record_id: rec.record_id, fields: rec.fields };
-}
-
 module.exports = {
-  init, ensureInit,
-  listAllRecords, createRecord, updateRecord,
+  init,
+  ensureInit,
+  listAllRecords,
 };

@@ -1,4 +1,7 @@
 node_modules/
 .env
+s.yaml
+s.env
 *.log
 .DS_Store
+.tmp-lark/

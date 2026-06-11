@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
+    "build:config": "node scripts/build-survey-config.js",
     "from-minutes": "node src/generate-from-minutes.js",
     "report": "node src/generate-report.js"
   },

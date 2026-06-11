@@ -1,14 +1,29 @@
+require('./env').loadEnv();
+
 const express = require('express');
 const path = require('path');
 const feishu = require('./feishu');
-const { cache, setScore, getPersonScores, getDashboardData, getRawData, getRecordId, loadFromRecords } = require('./cache');
-const { FIELD_NAMES, QUESTIONS, DIMENSIONS } = require('./questions');
+const {
+  getDashboardData,
+  getRawData,
+  loadFromRecords,
+} = require('./cache');
+const {
+  config,
+  QUESTION_DEFS,
+  DIMENSIONS,
+  FIELD_NAMES,
+  SCORE_MIN,
+  SCORE_MAX,
+  FORM_URL,
+} = require('./questions');
 
 const app = express();
 const PORT = process.env.FC_SERVER_PORT || process.env.PORT || 3000;
-const CACHE_TTL = 5000;
+const CACHE_TTL = Number(process.env.CACHE_TTL_MS || 3000);
+const LIVE_POLL_MS = Number(process.env.LIVE_POLL_MS || 3000);
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -22,183 +37,173 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 let lastCacheRefresh = 0;
 let cacheRefreshPromise = null;
+let lastBroadcastPayload = '';
+const eventClients = new Set();
 
-async function ensureCache() {
+async function refreshCache(force = false) {
   const now = Date.now();
-  if (now - lastCacheRefresh < CACHE_TTL && cache.stats.totalRegistered > 0) return;
-  if (cacheRefreshPromise) { await cacheRefreshPromise; return; }
+  if (!force && now - lastCacheRefresh < CACHE_TTL) return;
+  if (cacheRefreshPromise) {
+    await cacheRefreshPromise;
+    return;
+  }
 
   cacheRefreshPromise = (async () => {
-    try {
-      await feishu.ensureInit();
-      const recs = await feishu.listAllRecords();
-      if (recs !== null && recs.length >= 0) {
-        loadFromRecords(recs);
-        lastCacheRefresh = Date.now();
-      }
-    } catch (e) {
-      console.error('[缓存刷新失败]', e.message);
-    } finally {
-      cacheRefreshPromise = null;
-    }
+    await feishu.ensureInit();
+    const records = await feishu.listAllRecords();
+    loadFromRecords(records);
+    lastCacheRefresh = Date.now();
   })();
-  await cacheRefreshPromise;
+
+  try {
+    await cacheRefreshPromise;
+  } finally {
+    cacheRefreshPromise = null;
+  }
 }
 
-const NAME_FIELD = process.env.NAME_FIELD || '您的姓名';
-const DEPT_FIELD = process.env.DEPT_FIELD || '部门名称';
+async function freshDashboard(force = false) {
+  await refreshCache(force);
+  return getDashboardData();
+}
 
-app.post('/api/register', async (req, res) => {
+function writeEvent(res, event, payload) {
+  res.write(`event: ${event}\n`);
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+async function broadcastIfChanged(force = false) {
+  if (eventClients.size === 0) return;
+
   try {
-    const { name, department } = req.body;
-    if (!name || !department) {
-      return res.status(400).json({ ok: false, error: '姓名和部门不能为空' });
-    }
-
-    await feishu.ensureInit();
-    await ensureCache();
-
-    let recordId = getRecordId(name);
-    if (recordId) {
-      const scores = getPersonScores(name);
-      return res.json({ ok: true, recordId, scores });
-    }
-
-    const fields = { [NAME_FIELD]: name, [DEPT_FIELD]: department };
-    const record = await feishu.createRecord(fields);
-    if (!record) {
-      return res.status(500).json({ ok: false, error: '创建记录失败' });
-    }
-
-    recordId = record.record_id;
-    cache.nameToRecordId.set(name, recordId);
-    cache.scores.set(name, new Map());
-    cache.stats.totalRegistered = cache.nameToRecordId.size;
-    cache.stats.lastUpdate = new Date().toISOString();
-    lastCacheRefresh = Date.now();
-
-    res.json({ ok: true, recordId, scores: {} });
-  } catch (e) {
-    console.error('Register error:', e);
-    res.status(500).json({ ok: false, error: '服务器错误' });
+    const data = await freshDashboard(force);
+    const payload = JSON.stringify(data);
+    if (payload === lastBroadcastPayload && !force) return;
+    lastBroadcastPayload = payload;
+    for (const res of eventClients) writeEvent(res, 'dashboard', data);
+  } catch (error) {
+    const payload = { message: error.message, at: new Date().toISOString() };
+    for (const res of eventClients) writeEvent(res, 'error', payload);
+    console.error('[live refresh failed]', error);
   }
-});
+}
 
-app.post('/api/rate', async (req, res) => {
-  try {
-    const { name, questionIndex, score } = req.body;
-    if (!name) return res.status(400).json({ ok: false, error: '请先注册' });
-    if (typeof questionIndex !== 'number' || questionIndex < 0 || questionIndex >= FIELD_NAMES.length) {
-      return res.status(400).json({ ok: false, error: '题目索引无效' });
-    }
-    if (typeof score !== 'number' || score < 1 || score > 10) {
-      return res.status(400).json({ ok: false, error: '分数必须在1-10之间' });
-    }
-
-    await feishu.ensureInit();
-
-    let recordId = getRecordId(name);
-    if (!recordId) {
-      await ensureCache();
-      recordId = getRecordId(name);
-    }
-    if (!recordId) return res.status(400).json({ ok: false, error: '请先注册' });
-
-    const fieldName = FIELD_NAMES[questionIndex];
-    try {
-      await feishu.updateRecord(recordId, { [fieldName]: score });
-    } catch (e) {
-      console.error(`Write failed for ${name} Q${questionIndex}:`, e.message);
-      return res.status(500).json({ ok: false, error: '写入失败，请重试' });
-    }
-
-    setScore(name, recordId, questionIndex, score);
-    res.json({ ok: true });
-  } catch (e) {
-    console.error('Rate error:', e);
-    res.status(500).json({ ok: false, error: '服务器错误' });
-  }
-});
-
-app.post('/api/sync', async (req, res) => {
-  try {
-    const { name, ratings } = req.body;
-    if (!name || !ratings) return res.status(400).json({ ok: false, error: '参数无效' });
-
-    await feishu.ensureInit();
-
-    let recordId = getRecordId(name);
-    if (!recordId) {
-      await ensureCache();
-      recordId = getRecordId(name);
-    }
-    if (!recordId) return res.status(400).json({ ok: false, error: '请先注册' });
-
-    const fields = {};
-    let synced = 0;
-    for (const [idx, score] of Object.entries(ratings)) {
-      const i = Number(idx);
-      if (i >= 0 && i < FIELD_NAMES.length && score >= 1 && score <= 10) {
-        fields[FIELD_NAMES[i]] = score;
-        setScore(name, recordId, i, score);
-        synced++;
-      }
-    }
-
-    if (Object.keys(fields).length > 0) {
-      try {
-        await feishu.updateRecord(recordId, fields);
-      } catch (e) {
-        return res.status(500).json({ ok: false, error: '同步失败，请重试' });
-      }
-    }
-
-    res.json({ ok: true, synced });
-  } catch (e) {
-    console.error('Sync error:', e);
-    res.status(500).json({ ok: false, error: '服务器错误' });
-  }
+app.all(['/api/register', '/api/rate', '/api/sync'], (req, res) => {
+  res.status(410).json({
+    ok: false,
+    error: '请使用飞书问卷填写；本地服务只负责实时看板和统计。',
+    formUrl: FORM_URL,
+  });
 });
 
 app.get('/api/questions', (req, res) => {
   res.json({
-    questions: QUESTIONS,
-    dimensions: DIMENSIONS.map(d => ({ name: d.name, questionIndices: d.questionIndices }))
+    title: config.title,
+    scoreMin: SCORE_MIN,
+    scoreMax: SCORE_MAX,
+    questions: QUESTION_DEFS,
+    dimensions: DIMENSIONS,
+    baseUrl: config.baseUrl,
+    formUrl: FORM_URL,
   });
 });
 
 app.get('/api/dashboard', async (req, res) => {
-  await ensureCache();
-  res.json(getDashboardData());
+  try {
+    const data = await freshDashboard(req.query.force === '1');
+    res.json(data);
+  } catch (error) {
+    console.error('[dashboard failed]', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
 });
 
 app.get('/api/rawdata', async (req, res) => {
-  await ensureCache();
-  res.json(getRawData());
+  try {
+    await refreshCache(req.query.force === '1');
+    res.json(getRawData());
+  } catch (error) {
+    console.error('[rawdata failed]', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
+app.get('/api/events', async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  if (res.flushHeaders) res.flushHeaders();
+
+  eventClients.add(res);
+  try {
+    writeEvent(res, 'dashboard', await freshDashboard());
+  } catch (error) {
+    writeEvent(res, 'error', { message: error.message, at: new Date().toISOString() });
+  }
+
+  const heartbeat = setInterval(() => {
+    writeEvent(res, 'heartbeat', { at: Date.now() });
+  }, 15000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    eventClients.delete(res);
+  });
 });
 
 app.get('/api/export-csv', async (req, res) => {
-  await ensureCache();
-  const data = getRawData();
-  const BOM = '﻿';
-  let csv = BOM + '姓名,' + data.questions.map((q, i) => 'Q' + (i + 1)).join(',') + '\n';
-  for (const p of data.people) {
-    csv += p.name;
-    for (let i = 0; i < data.questions.length; i++) {
-      csv += ',' + (p.scores[i] !== undefined ? p.scores[i] : '');
-    }
-    csv += '\n';
+  try {
+    await refreshCache(req.query.force === '1');
+    const data = getRawData();
+    const header = [
+      '姓名',
+      '手机号',
+      '部门',
+      '完成题数',
+      ...DIMENSIONS.map((theme) => theme.name),
+      '总分',
+      ...FIELD_NAMES,
+    ];
+
+    const rows = data.people.map((person) => [
+      person.name,
+      person.phone,
+      person.department,
+      person.completedCount,
+      ...person.themes.map((theme) => theme.total),
+      person.totalScore,
+      ...FIELD_NAMES.map((_, idx) => person.scores[idx] ?? ''),
+    ]);
+
+    const csvEscape = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+    const csv = `\uFEFF${[header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n')}`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=sales-skill-scoreboard.csv');
+    res.send(csv);
+  } catch (error) {
+    console.error('[export failed]', error);
+    res.status(500).json({ ok: false, error: error.message });
   }
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename=scores.csv');
-  res.send(csv);
 });
 
-const listenPort = process.env.FC_SERVER_PORT || PORT;
-app.listen(listenPort, '0.0.0.0', () => {
-  console.log(`[lark-survey-scoreboard] 服务器已启动: http://localhost:${listenPort}`);
-  console.log(`  手机评分页: http://localhost:${listenPort}/rating.html`);
-  console.log(`  大屏展示页: http://localhost:${listenPort}/dashboard.html`);
+app.get('/api/health', async (req, res) => {
+  try {
+    await refreshCache(false);
+    res.json({ ok: true, stats: getDashboardData().stats });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
+setInterval(() => {
+  broadcastIfChanged(true);
+}, LIVE_POLL_MS).unref();
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[lark-survey-scoreboard] server ready: http://localhost:${PORT}`);
+  console.log(`survey:    ${FORM_URL}`);
+  console.log(`dashboard: http://localhost:${PORT}/dashboard.html`);
 });
 
 module.exports = app;

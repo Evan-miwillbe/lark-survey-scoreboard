@@ -2,116 +2,783 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>实时评分大屏</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>诚信销售技能盘点现场看板</title>
 <style>
-:root{--bg:#0B0F1A;--card:rgba(15,25,50,0.7);--text:#E8ECF1;--muted:#7B8BA3;--high:#00E5A0;--low:#FF6B6B;--mid:#FFD166;--border:rgba(255,255,255,0.06)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border)}
-.header h1{font-size:1.3rem;font-weight:600}
-.stats{display:flex;gap:24px}
-.stat{text-align:center}
-.stat-val{font-size:1.8rem;font-weight:700;color:var(--high)}
-.stat-label{font-size:0.75rem;color:var(--muted);margin-top:2px}
-.grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px;overflow:hidden}
-.dim-card{background:var(--card);border-radius:10px;padding:12px;border:1px solid var(--border);display:flex;flex-direction:column}
-.dim-title{font-size:0.85rem;font-weight:600;margin-bottom:8px;color:var(--text)}
-.chart-area{flex:1;min-height:0}
-.pulse{animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+:root {
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d7dde6;
+  --soft: #edf1f6;
+  --blue: #2563eb;
+  --green: #0e9f6e;
+  --amber: #f59e0b;
+  --rose: #e11d48;
+  --shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+a { color: inherit; text-decoration: none; }
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 24px;
+  background: rgba(244, 246, 248, 0.95);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+.title-wrap { min-width: 0; }
+h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.subtitle {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+}
+.btn.primary {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+.layout {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.stat-card, .panel, .theme-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.stat-card {
+  min-height: 88px;
+  padding: 14px;
+}
+.stat-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+.stat-value {
+  margin-top: 8px;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+.stat-foot {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.panel {
+  min-width: 0;
+  padding: 14px;
+}
+.panel-head, .theme-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.panel-head { margin-bottom: 12px; }
+.panel h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.theme-card {
+  min-width: 0;
+  padding: 12px;
+}
+.theme-title {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.theme-number {
+  color: var(--blue);
+  font-weight: 900;
+  font-size: 13px;
+}
+.theme-name {
+  font-size: 16px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-score {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.theme-summary {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 9px;
+}
+.progress-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+  min-height: 22px;
+}
+.question-label, .person-label {
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.question-label {
+  text-align: right;
+}
+.progress-track {
+  position: relative;
+  height: 13px;
+  border-radius: 999px;
+  background: var(--soft);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  transition: width 280ms ease;
+}
+.progress-value {
+  color: #172033;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+}
+.question-text {
+  grid-column: 2 / 4;
+  margin-top: -3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.tooltip-host {
+  position: relative;
+}
+.tooltip-host::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 40;
+  width: min(430px, 88vw);
+  transform: translateX(-50%);
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.96);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-line;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease;
+}
+.tooltip-host:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+.query-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.36fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.search {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 15px;
+}
+.matches {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 360px;
+  overflow: auto;
+}
+.match {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.match.selected {
+  border-color: var(--blue);
+  background: #eff6ff;
+}
+.match-name {
+  font-size: 15px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.match-meta {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.match-score {
+  color: var(--blue);
+  font-size: 18px;
+  font-weight: 900;
+}
+.person-card {
+  min-height: 360px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+.person-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.person-name {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.2;
+  word-break: break-word;
+}
+.person-meta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.person-average {
+  flex: 0 0 auto;
+  text-align: right;
+}
+.person-average strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+}
+.person-average span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.person-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.mini {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px;
+  background: #fbfcfe;
+}
+.mini span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.mini strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+}
+.person-theme-bars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 12px;
+}
+.person-theme {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+  min-height: 30px;
+}
+.empty {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+  padding: 18px;
+  color: var(--muted);
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+@media (max-width: 1320px) {
+  .themes-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .themes-grid { grid-template-columns: 1fr; }
+  .query-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .topbar {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px;
+  }
+  .actions { width: 100%; }
+  .btn { flex: 1; }
+  .layout { padding: 10px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-value { font-size: 28px; }
+  .person-theme-bars { grid-template-columns: 1fr; }
+  .progress-row { grid-template-columns: 54px minmax(0, 1fr) 38px; }
+}
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>实时评分看板</h1>
-  <div class="stats">
-    <div class="stat"><div class="stat-val" id="s-registered">0</div><div class="stat-label">参与人数</div></div>
-    <div class="stat"><div class="stat-val" id="s-completed">0</div><div class="stat-label">已完成</div></div>
-    <div class="stat"><div class="stat-val" id="s-ratings">0</div><div class="stat-label">总评分数</div></div>
-    <div class="stat"><div class="stat-val pulse" id="s-live">LIVE</div><div class="stat-label">实时刷新</div></div>
+<header class="topbar">
+  <div class="title-wrap">
+    <h1 id="title">诚信销售技能盘点现场看板</h1>
+    <div class="subtitle" id="subtitle">等待飞书问卷提交</div>
   </div>
-</div>
-<div class="grid" id="grid"></div>
+  <div class="actions">
+    <a class="btn primary" id="form-link" target="_blank" rel="noopener">打开飞书问卷</a>
+    <a class="btn" id="export-link">导出 CSV</a>
+  </div>
+</header>
 
+<main class="layout">
+  <section class="stats">
+    <div class="stat-card"><div class="stat-label">飞书提交数</div><div class="stat-value" id="stat-submissions">0</div><div class="stat-foot">原始提交记录</div></div>
+    <div class="stat-card"><div class="stat-label">有效人数</div><div class="stat-value" id="stat-people">0</div><div class="stat-foot">同名同手机号保留最新</div></div>
+    <div class="stat-card"><div class="stat-label">完成 120 题</div><div class="stat-value" id="stat-completed">0</div><div class="stat-foot">完整问卷人数</div></div>
+    <div class="stat-card"><div class="stat-label">整体均分</div><div class="stat-value" id="stat-average">0.0</div><div class="stat-foot">按 10 分制计算</div></div>
+    <div class="stat-card"><div class="stat-label">合并重复</div><div class="stat-value" id="stat-duplicates">0</div><div class="stat-foot">重复提交份数</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>12 个板块 · 120 题实时进度</h2>
+        <div class="hint">每个板块 10 道题，进度条显示该题当前平均分</div>
+      </div>
+      <span class="hint" id="last-update">未刷新</span>
+    </div>
+    <div class="themes-grid" id="themes-grid"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>个人查询</h2>
+        <div class="hint">输入姓名后，直接查看该人员 12 个板块平均分；鼠标悬停在进度条上可看 10 题明细</div>
+      </div>
+    </div>
+    <div class="query-grid">
+      <div>
+        <input class="search" id="person-search" placeholder="输入姓名、手机号或部门">
+        <div class="matches" id="matches"></div>
+      </div>
+      <aside class="person-card" id="person-card"></aside>
+    </div>
+  </section>
+</main>
+
+<script src="./config.js"></script>
 <script>
-const API_BASE = window.location.origin;
-let charts = [];
-let dimNames = [];
+const state = {
+  data: null,
+  selectedKey: '',
+  search: '',
+};
 
-function getColor(val) {
-  if (val === 0) return 'rgba(255,255,255,0.1)';
-  if (val >= 7) return '#00E5A0';
-  if (val >= 5) return '#FFD166';
-  return '#FF6B6B';
-}
+const els = {
+  title: document.getElementById('title'),
+  subtitle: document.getElementById('subtitle'),
+  formLink: document.getElementById('form-link'),
+  exportLink: document.getElementById('export-link'),
+  lastUpdate: document.getElementById('last-update'),
+  themesGrid: document.getElementById('themes-grid'),
+  personSearch: document.getElementById('person-search'),
+  matches: document.getElementById('matches'),
+  personCard: document.getElementById('person-card'),
+  stats: {
+    submissions: document.getElementById('stat-submissions'),
+    people: document.getElementById('stat-people'),
+    completed: document.getElementById('stat-completed'),
+    average: document.getElementById('stat-average'),
+    duplicates: document.getElementById('stat-duplicates'),
+  },
+};
 
-async function init() {
-  const r = await fetch(API_BASE + '/api/questions');
-  const data = await r.json();
-  dimNames = data.dimensions.map(d => d.name);
+const API_BASE = resolveApiBase();
+els.exportLink.href = apiUrl('/api/export-csv?force=1');
 
-  const grid = document.getElementById('grid');
-  const rows = Math.ceil(dimNames.length / 3);
-  grid.style.gridTemplateRows = `repeat(${rows},1fr)`;
-
-  dimNames.forEach((name, i) => {
-    const card = document.createElement('div');
-    card.className = 'dim-card';
-    card.innerHTML = `<div class="dim-title">${name}</div><div class="chart-area" id="chart-${i}"></div>`;
-    grid.appendChild(card);
-  });
-
-  dimNames.forEach((_, i) => {
-    const chart = echarts.init(document.getElementById(`chart-${i}`));
-    charts.push(chart);
-  });
-
-  window.addEventListener('resize', () => charts.forEach(c => c.resize()));
-  poll();
-  setInterval(poll, 1000);
-}
-
-async function poll() {
-  try {
-    const r = await fetch(API_BASE + '/api/dashboard');
-    const data = await r.json();
-    updateStats(data.stats);
-    updateCharts(data.dimensions);
-  } catch (e) {
-    console.warn('轮询失败', e);
+function resolveApiBase() {
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get('api');
+  if (fromQuery) {
+    const normalized = fromQuery.replace(/\/+$/, '');
+    localStorage.setItem('scoreboardApiBase', normalized);
+    return normalized;
   }
+  const configured = window.SCOREBOARD_API_BASE || localStorage.getItem('scoreboardApiBase') || '';
+  return configured.replace(/\/+$/, '');
 }
 
-function updateStats(stats) {
-  document.getElementById('s-registered').textContent = stats.totalRegistered;
-  document.getElementById('s-completed').textContent = stats.totalCompleted;
-  document.getElementById('s-ratings').textContent = stats.totalRatings;
+function apiUrl(path) {
+  return `${API_BASE}${path}`;
 }
 
-function updateCharts(dimensions) {
-  dimensions.forEach((dim, i) => {
-    const labels = dim.questions.map(q => 'Q' + (q.index + 1));
-    const values = dim.questions.map(q => q.average);
-    const colors = values.map(getColor);
+function needsApiConfig() {
+  return !API_BASE && /\.github\.io$/i.test(window.location.hostname);
+}
 
-    charts[i].setOption({
-      grid: { left: 40, right: 12, top: 8, bottom: 20 },
-      xAxis: { type: 'category', data: labels, axisLabel: { color: '#7B8BA3', fontSize: 10 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
-      yAxis: { type: 'value', min: 0, max: 10, splitNumber: 5, axisLabel: { color: '#7B8BA3', fontSize: 10 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-      series: [{
-        type: 'bar',
-        data: values.map((v, j) => ({ value: v, itemStyle: { color: colors[j], borderRadius: [3, 3, 0, 0] } })),
-        barMaxWidth: 28,
-        label: { show: true, position: 'top', color: '#E8ECF1', fontSize: 10, formatter: p => p.value > 0 ? p.value.toFixed(1) : '' }
-      }],
-      animation: true,
-      animationDuration: 300
+function chartColor(value) {
+  if (!value) return '#cfd7e3';
+  if (value >= 8) return '#0e9f6e';
+  if (value >= 6.5) return '#2563eb';
+  if (value >= 5) return '#f59e0b';
+  return '#e11d48';
+}
+
+function formatNumber(value, digits = 1) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(digits) : '0.0';
+}
+
+function formatTime(value) {
+  if (!value) return '未刷新';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('zh-CN', { hour12: false });
+}
+
+function barWidth(value, max = 10) {
+  return Math.max(0, Math.min(100, Number(value || 0) / max * 100));
+}
+
+async function loadQuestions() {
+  if (needsApiConfig()) {
+    throw new Error('请先在 public/config.js 设置 FC3 API 地址，或在 URL 后加 ?api=你的FC3地址');
+  }
+  const res = await fetch(apiUrl('/api/questions'));
+  const data = await res.json();
+  els.title.textContent = data.title || '诚信销售技能盘点现场看板';
+  els.formLink.href = data.formUrl || '#';
+  els.subtitle.textContent = `${data.dimensions.length} 个板块，${data.questions.length} 题，飞书问卷提交后自动刷新`;
+}
+
+async function loadDashboard(force = false) {
+  if (needsApiConfig()) return;
+  const res = await fetch(apiUrl(`/api/dashboard${force ? '?force=1' : ''}`));
+  const data = await res.json();
+  if (data.ok === false) throw new Error(data.error || 'dashboard failed');
+  render(data);
+}
+
+function render(data) {
+  state.data = data;
+  ensureSelection();
+  renderStats(data.stats);
+  renderThemeSections(data.dimensions);
+  renderPersonLookup();
+}
+
+function renderStats(stats) {
+  els.stats.submissions.textContent = stats.totalSubmissions || 0;
+  els.stats.people.textContent = stats.totalRegistered || 0;
+  els.stats.completed.textContent = stats.totalCompleted || 0;
+  els.stats.average.textContent = formatNumber(stats.overallAverage || 0, 1);
+  els.stats.duplicates.textContent = stats.duplicateSubmissions || 0;
+  els.lastUpdate.textContent = formatTime(stats.lastUpdate);
+}
+
+function renderThemeSections(dimensions) {
+  if (!dimensions.length) {
+    els.themesGrid.innerHTML = '<div class="empty">等待飞书问卷提交</div>';
+    return;
+  }
+
+  els.themesGrid.innerHTML = dimensions.map((theme) => {
+    const average = Number(theme.average || 0);
+    const questionRows = theme.questions.map((question) => {
+      const value = Number(question.average || 0);
+      const tooltip = [
+        `Q${String(question.number).padStart(3, '0')} ${question.text}`,
+        `当前平均分：${formatNumber(value)} / 10`,
+        `答题人数：${question.responseCount || 0}`,
+      ].join('\n');
+      return `
+        <div class="progress-row tooltip-host" data-tooltip="${escapeAttr(tooltip)}">
+          <div class="question-label">Q${String(question.number).padStart(3, '0')}</div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${barWidth(value)}%;background:${chartColor(value)}"></div>
+          </div>
+          <div class="progress-value">${formatNumber(value)}</div>
+          <div class="question-text">${escapeHtml(question.text)}</div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <article class="theme-card">
+        <div class="theme-head">
+          <div class="theme-title">
+            <span class="theme-number">${String(theme.number).padStart(2, '0')}</span>
+            <span class="theme-name">${escapeHtml(theme.shortName || theme.name)}</span>
+          </div>
+          <div class="theme-score">${formatNumber(average)}</div>
+        </div>
+        <div class="theme-summary">
+          <div class="progress-row">
+            <div class="question-label">板块</div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${barWidth(average)}%;background:${chartColor(average)}"></div>
+            </div>
+            <div class="progress-value">${theme.participantCount || 0}人</div>
+          </div>
+        </div>
+        ${questionRows}
+      </article>
+    `;
+  }).join('');
+}
+
+function allPeople() {
+  return state.data ? state.data.people : [];
+}
+
+function matchingPeople() {
+  const keyword = state.search.trim().toLowerCase();
+  const people = allPeople();
+  if (!keyword) return people;
+  return people.filter((person) => {
+    const text = [person.name, person.phone, person.phoneTail, person.department]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return text.includes(keyword);
+  });
+}
+
+function ensureSelection() {
+  const people = matchingPeople();
+  if (state.selectedKey && people.some((person) => person.key === state.selectedKey)) return;
+  state.selectedKey = people[0] ? people[0].key : '';
+}
+
+function renderPersonLookup() {
+  const people = matchingPeople();
+  ensureSelection();
+  renderMatches(people);
+  const selected = allPeople().find((person) => person.key === state.selectedKey) || people[0] || null;
+  renderPerson(selected);
+}
+
+function renderMatches(people) {
+  if (!state.data || !allPeople().length) {
+    els.matches.innerHTML = '<div class="empty">暂无人员数据。提交飞书问卷后即可查询。</div>';
+    return;
+  }
+
+  if (!people.length) {
+    els.matches.innerHTML = '<div class="empty">没有找到匹配人员。</div>';
+    return;
+  }
+
+  els.matches.innerHTML = people.slice(0, 60).map((person) => `
+    <button class="match ${person.key === state.selectedKey ? 'selected' : ''}" data-key="${escapeAttr(person.key)}">
+      <div>
+        <div class="match-name">${escapeHtml(person.name)}</div>
+        <div class="match-meta">${escapeHtml(person.department || '未填写部门')} · ${escapeHtml(person.phoneTail ? `尾号 ${person.phoneTail}` : '无手机号')}</div>
+      </div>
+      <div class="match-score">${formatNumber(person.averageScore)}</div>
+    </button>
+  `).join('');
+
+  els.matches.querySelectorAll('.match').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedKey = button.dataset.key;
+      renderPersonLookup();
     });
   });
 }
 
-init();
+function renderPerson(person) {
+  if (!person) {
+    els.personCard.innerHTML = '<div class="empty">输入姓名后，这里会显示该人员 12 个板块平均分。</div>';
+    return;
+  }
+
+  const dimensions = state.data.dimensions;
+  const themeRows = person.themes.map((theme) => {
+    const dimension = dimensions.find((item) => item.id === theme.id || item.number === theme.number);
+    const value = Number(theme.average || 0);
+    const tooltip = buildPersonThemeTooltip(person, theme, dimension);
+    return `
+      <div class="person-theme tooltip-host" data-tooltip="${escapeAttr(tooltip)}">
+        <div class="person-label">${escapeHtml(theme.shortName || theme.name)}</div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${barWidth(value)}%;background:${chartColor(value)}"></div>
+        </div>
+        <div class="progress-value">${formatNumber(value)}</div>
+      </div>
+    `;
+  }).join('');
+
+  els.personCard.innerHTML = `
+    <div class="person-head">
+      <div>
+        <div class="person-name">${escapeHtml(person.name)}</div>
+        <div class="person-meta">${escapeHtml(person.department || '未填写部门')} · ${escapeHtml(person.phoneTail ? `手机号尾号 ${person.phoneTail}` : '未填写手机号')}</div>
+      </div>
+      <div class="person-average">
+        <strong>${formatNumber(person.averageScore)}</strong>
+        <span>个人总均分</span>
+      </div>
+    </div>
+    <div class="person-stats">
+      <div class="mini"><span>完成</span><strong>${person.completedCount}/120</strong></div>
+      <div class="mini"><span>总分</span><strong>${person.totalScore}</strong></div>
+      <div class="mini"><span>最近提交</span><strong>${formatShortTime(person.lastSubmittedAt)}</strong></div>
+    </div>
+    <div class="person-theme-bars">${themeRows}</div>
+  `;
+}
+
+function buildPersonThemeTooltip(person, theme, dimension) {
+  const lines = [
+    `${theme.name}：平均分 ${formatNumber(theme.average)} / 10，总分 ${theme.total} / ${theme.fullScore}`,
+  ];
+  const questions = dimension ? dimension.questions : [];
+  for (const question of questions) {
+    const raw = person.scores[String(question.index)];
+    const score = raw === undefined ? '未答' : `${raw}分`;
+    lines.push(`Q${String(question.number).padStart(3, '0')}：${score} · ${question.text}`);
+  }
+  return lines.join('\n');
+}
+
+function formatShortTime(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/'/g, '&#39;');
+}
+
+els.personSearch.addEventListener('input', () => {
+  state.search = els.personSearch.value;
+  state.selectedKey = '';
+  renderPersonLookup();
+});
+
+loadQuestions().catch((error) => {
+  els.subtitle.textContent = error.message;
+});
+loadDashboard(true).catch((error) => {
+  els.subtitle.textContent = error.message;
+});
+
+if (window.EventSource) {
+  const events = needsApiConfig() ? null : new EventSource(apiUrl('/api/events'));
+  if (events) {
+    events.addEventListener('dashboard', (event) => render(JSON.parse(event.data)));
+    events.addEventListener('error', () => {
+      loadDashboard(false).catch(() => {});
+    });
+  }
+} else {
+  setInterval(() => loadDashboard(false).catch(() => {}), 3000);
+}
 </script>
 </body>
 </html>

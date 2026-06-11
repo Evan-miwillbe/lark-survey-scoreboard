@@ -1,0 +1,1220 @@
+{
+  "title": "诚信销售技能盘点清单",
+  "baseToken": "STIKbVfxvaxd4PsvdBKcaQTKnFe",
+  "tableId": "tbl2uUjvQ4MochWh",
+  "formId": "vewohSG9xB",
+  "baseUrl": "https://tcnalhaufj4o.feishu.cn/base/STIKbVfxvaxd4PsvdBKcaQTKnFe",
+  "formUrl": "https://tcnalhaufj4o.feishu.cn/base/STIKbVfxvaxd4PsvdBKcaQTKnFe?table=tbl2uUjvQ4MochWh&view=vewohSG9xB",
+  "scoreMin": 1,
+  "scoreMax": 10,
+  "identityFields": {
+    "department": "部门名称",
+    "name": "您的姓名",
+    "phone": "手机号"
+  },
+  "questions": [
+    {
+      "id": "fld9dna1mF",
+      "field": "我有清楚的个人目标和工作目标指导自己取得成功，我把这些目标都记录在案。",
+      "number": 1,
+      "text": "我有清楚的个人目标和工作目标指导自己取得成功，我把这些目标都记录在案。",
+      "required": true
+    },
+    {
+      "id": "fldELdn3gt",
+      "field": "大家认为我的积极性很高。",
+      "number": 2,
+      "text": "大家认为我的积极性很高。",
+      "required": true
+    },
+    {
+      "id": "flddCD7tze",
+      "field": "大家认为可以与我同享乐、共患难。",
+      "number": 3,
+      "text": "大家认为可以与我同享乐、共患难。",
+      "required": true
+    },
+    {
+      "id": "fldT3sOF26",
+      "field": "我非常善于倾听。",
+      "number": 4,
+      "text": "我非常善于倾听。",
+      "required": true
+    },
+    {
+      "id": "fldYHNB19r",
+      "field": "我坚持回顾之前的拜访记录，为下次拜访做准备。",
+      "number": 5,
+      "text": "我坚持回顾之前的拜访记录，为下次拜访做准备。",
+      "required": true
+    },
+    {
+      "id": "fld3Zcoz25",
+      "field": "销售的第一要件是让客户感到放松。",
+      "number": 6,
+      "text": "销售的第一要件是让客户感到放松。",
+      "required": true
+    },
+    {
+      "id": "fld7hAjkdw",
+      "field": "在我彻底了解客户的需求之前，绝不演示产品给客户看。",
+      "number": 7,
+      "text": "在我彻底了解客户的需求之前，绝不演示产品给客户看。",
+      "required": true
+    },
+    {
+      "id": "fldv8B2kl4",
+      "field": "我会根据客户的特定需求对产品演示进行调整。",
+      "number": 8,
+      "text": "我会根据客户的特定需求对产品演示进行调整。",
+      "required": true
+    },
+    {
+      "id": "fldyCBZ6c1",
+      "field": "院方人员很快就发现我对产品很熟悉。",
+      "number": 9,
+      "text": "院方人员很快就发现我对产品很熟悉。",
+      "required": true
+    },
+    {
+      "id": "fldWenHeMo",
+      "field": "在拜访过程中我能够感觉到客户有未说出口的顾虑或异议。",
+      "number": 10,
+      "text": "在拜访过程中我能够感觉到客户有未说出口的顾虑或异议。",
+      "required": true
+    },
+    {
+      "id": "fldlnNB0wO",
+      "field": "在拜访过程中我能够感觉到客户有未说出口的顾虑或异议。在确信客户一定会给出肯定答案之前， 我不会要求客户作出决定。",
+      "number": 11,
+      "text": "在拜访过程中我能够感觉到客户有未说出口的顾虑或异议。在确信客户一定会给出肯定答案之前， 我不会要求客户作出决定。",
+      "required": true
+    },
+    {
+      "id": "fldXKGxr6g",
+      "field": "我有良好的习惯，每次拜访后我都做好访后记录。",
+      "number": 12,
+      "text": "我有良好的习惯，每次拜访后我都做好访后记录。",
+      "required": true
+    },
+    {
+      "id": "fldlO2XsjZ",
+      "field": "我经常在脑海中想象目标实现时的情景。",
+      "number": 13,
+      "text": "我经常在脑海中想象目标实现时的情景。",
+      "required": true
+    },
+    {
+      "id": "fldj9JP8LY",
+      "field": "我注重目标大于注重过程。",
+      "number": 14,
+      "text": "我注重目标大于注重过程。",
+      "required": true
+    },
+    {
+      "id": "fldQKNt47p",
+      "field": "即使是在其他人情绪失控的情况下，我也能够保持冷静。",
+      "number": 15,
+      "text": "即使是在其他人情绪失控的情况下，我也能够保持冷静。",
+      "required": true
+    },
+    {
+      "id": "fldD63u5LM",
+      "field": "我凭直觉就能够捕捉和理解人们的言外之意。",
+      "number": 16,
+      "text": "我凭直觉就能够捕捉和理解人们的言外之意。",
+      "required": true
+    },
+    {
+      "id": "fldTT5DsZ6",
+      "field": "针对客户不同的行为风格， 我会选择适当的数据和证明材料。",
+      "number": 17,
+      "text": "针对客户不同的行为风格， 我会选择适当的数据和证明材料。",
+      "required": true
+    },
+    {
+      "id": "fld6Ff9ylo",
+      "field": "我善于察觉别人的感受，有办法让别人感到放松。",
+      "number": 18,
+      "text": "我善于察觉别人的感受，有办法让别人感到放松。",
+      "required": true
+    },
+    {
+      "id": "fldBdUIL8h",
+      "field": "我从客户身上获得信息，从而确定面谈方向。",
+      "number": 19,
+      "text": "我从客户身上获得信息，从而确定面谈方向。",
+      "required": true
+    },
+    {
+      "id": "fld94gGy3K",
+      "field": "我的演示总是针对我在面谈中发现的需求和问题。",
+      "number": 20,
+      "text": "我的演示总是针对我在面谈中发现的需求和问题。",
+      "required": true
+    },
+    {
+      "id": "fldLjhlBiq",
+      "field": "人们能够感受到我对产品的疗效确实抱有信心。",
+      "number": 21,
+      "text": "人们能够感受到我对产品的疗效确实抱有信心。",
+      "required": true
+    },
+    {
+      "id": "fldB58q2Yy",
+      "field": "在演示中，我总是鼓励客户表达他们的顾虑或异议。",
+      "number": 22,
+      "text": "在演示中，我总是鼓励客户表达他们的顾虑或异议。",
+      "required": true
+    },
+    {
+      "id": "fld0d53FHX",
+      "field": "我能够把握时机，适时请求客户作出决定或采取下一个行动。",
+      "number": 23,
+      "text": "我能够把握时机，适时请求客户作出决定或采取下一个行动。",
+      "required": true
+    },
+    {
+      "id": "fldZTTNNgo",
+      "field": "我坚持信守我作出的承诺。",
+      "number": 24,
+      "text": "我坚持信守我作出的承诺。",
+      "required": true
+    },
+    {
+      "id": "fldrnd9OIH",
+      "field": "我相信在未来我会实现更远大的目标。",
+      "number": 25,
+      "text": "我相信在未来我会实现更远大的目标。",
+      "required": true
+    },
+    {
+      "id": "fldXd14RLd",
+      "field": "我内心非常渴望成功。",
+      "number": 26,
+      "text": "我内心非常渴望成功。",
+      "required": true
+    },
+    {
+      "id": "fldfSmDjXN",
+      "field": "我能够把失败和障碍当作成长的阶梯。",
+      "number": 27,
+      "text": "我能够把失败和障碍当作成长的阶梯。",
+      "required": true
+    },
+    {
+      "id": "fldJqRqA8i",
+      "field": "在对异议作出回应之前我会花时间先把问题搞清楚。",
+      "number": 28,
+      "text": "在对异议作出回应之前我会花时间先把问题搞清楚。",
+      "required": true
+    },
+    {
+      "id": "fldO1yJq2r",
+      "field": "除了每次拜访要实现的具体目标之外，我还针对客户制定书面的长期目标。",
+      "number": 29,
+      "text": "除了每次拜访要实现的具体目标之外，我还针对客户制定书面的长期目标。",
+      "required": true
+    },
+    {
+      "id": "fldvhV4k61",
+      "field": "我认为建立融洽的关系是每次拜访的重要内容。",
+      "number": 30,
+      "text": "我认为建立融洽的关系是每次拜访的重要内容。",
+      "required": true
+    },
+    {
+      "id": "fldHOi7Ixh",
+      "field": "我不断通过提问让客户认识到目前状况与理想状况之间的差距。",
+      "number": 31,
+      "text": "我不断通过提问让客户认识到目前状况与理想状况之间的差距。",
+      "required": true
+    },
+    {
+      "id": "fldwKXmf1Q",
+      "field": "和产品特性相比，我更关注产品给客户带来的利益。",
+      "number": 32,
+      "text": "和产品特性相比，我更关注产品给客户带来的利益。",
+      "required": true
+    },
+    {
+      "id": "fldjcmIbQr",
+      "field": "我能出具合适的数据和证据来证明我的说法。",
+      "number": 33,
+      "text": "我能出具合适的数据和证据来证明我的说法。",
+      "required": true
+    },
+    {
+      "id": "fldlmDcejZ",
+      "field": "我用专业镇静的态度对待客户的负面回应。",
+      "number": 34,
+      "text": "我用专业镇静的态度对待客户的负面回应。",
+      "required": true
+    },
+    {
+      "id": "fldQVJEXnz",
+      "field": "在要求客户作出决定时，我安静地等待客户作出回答。",
+      "number": 35,
+      "text": "在要求客户作出决定时，我安静地等待客户作出回答。",
+      "required": true
+    },
+    {
+      "id": "fldahLWLdn",
+      "field": "在每次拜访结束后，我都会马上通过自我评估来判断是否实现了预定目标。",
+      "number": 36,
+      "text": "在每次拜访结束后，我都会马上通过自我评估来判断是否实现了预定目标。",
+      "required": true
+    },
+    {
+      "id": "fldfI1jedj",
+      "field": "我觉得追求更高的目标能体现我的价值。",
+      "number": 37,
+      "text": "我觉得追求更高的目标能体现我的价值。",
+      "required": true
+    },
+    {
+      "id": "fldys9oPeA",
+      "field": "我阅读有助于个人发展和专业进步的书籍， 向成功者学习。",
+      "number": 38,
+      "text": "我阅读有助于个人发展和专业进步的书籍， 向成功者学习。",
+      "required": true
+    },
+    {
+      "id": "fldQAGd971",
+      "field": "出于自尊心，我不会跟批评或挑战我的人极力争辩。",
+      "number": 39,
+      "text": "出于自尊心，我不会跟批评或挑战我的人极力争辩。",
+      "required": true
+    },
+    {
+      "id": "fldDXg7zN0",
+      "field": "我能凭直觉理解别人的感受。",
+      "number": 40,
+      "text": "我能凭直觉理解别人的感受。",
+      "required": true
+    },
+    {
+      "id": "fldZGrMdes",
+      "field": "在访前计划中我会考虑客户的行为风格。",
+      "number": 41,
+      "text": "在访前计划中我会考虑客户的行为风格。",
+      "required": true
+    },
+    {
+      "id": "fldTdNe43X",
+      "field": "与客户接近时，我关注的焦点放在客户身上而不是放在自己身上。",
+      "number": 42,
+      "text": "与客户接近时，我关注的焦点放在客户身上而不是放在自己身上。",
+      "required": true
+    },
+    {
+      "id": "fldxyF4MsB",
+      "field": "在理解某种产品如何满足客户需求之前，我不会推销该产品。",
+      "number": 43,
+      "text": "在理解某种产品如何满足客户需求之前，我不会推销该产品。",
+      "required": true
+    },
+    {
+      "id": "fld4dMhAsb",
+      "field": "通过演示我能展示出产品价值、消除客户异议。",
+      "number": 44,
+      "text": "通过演示我能展示出产品价值、消除客户异议。",
+      "required": true
+    },
+    {
+      "id": "fldDMZi5eJ",
+      "field": "客户能感觉到我的诚实和坦诚。",
+      "number": 45,
+      "text": "客户能感觉到我的诚实和坦诚。",
+      "required": true
+    },
+    {
+      "id": "fldEA6fl7y",
+      "field": "我从不企图回避客户的异议或顾虑。",
+      "number": 46,
+      "text": "我从不企图回避客户的异议或顾虑。",
+      "required": true
+    },
+    {
+      "id": "fldfBNf4GH",
+      "field": "只有在我的产品能够满足客户需求时，我才会要求客户作出决定。",
+      "number": 47,
+      "text": "只有在我的产品能够满足客户需求时，我才会要求客户作出决定。",
+      "required": true
+    },
+    {
+      "id": "fldMYJl4tG",
+      "field": "每次拜访后我会确定跟进行动。",
+      "number": 48,
+      "text": "每次拜访后我会确定跟进行动。",
+      "required": true
+    },
+    {
+      "id": "fldzU9aI83",
+      "field": "我经常回顾并调整我的目标。",
+      "number": 49,
+      "text": "我经常回顾并调整我的目标。",
+      "required": true
+    },
+    {
+      "id": "fldA2TjfEb",
+      "field": "我努力向成功者学习。",
+      "number": 50,
+      "text": "我努力向成功者学习。",
+      "required": true
+    },
+    {
+      "id": "fld7XK2SiT",
+      "field": "消极的人和艰难的环境都吓不倒我。",
+      "number": 51,
+      "text": "消极的人和艰难的环境都吓不倒我。",
+      "required": true
+    },
+    {
+      "id": "fldBY3IEL6",
+      "field": "在与客户接近时，我能够引导客户开口谈论自己和他们所关注的问题。",
+      "number": 52,
+      "text": "在与客户接近时，我能够引导客户开口谈论自己和他们所关注的问题。",
+      "required": true
+    },
+    {
+      "id": "fldj4P8wkY",
+      "field": "我每次的拜访目标都很明确，并且可以衡量。",
+      "number": 53,
+      "text": "我每次的拜访目标都很明确，并且可以衡量。",
+      "required": true
+    },
+    {
+      "id": "fldWklv6Am",
+      "field": "我能够让客户告诉我他们的兴趣所在。",
+      "number": 54,
+      "text": "我能够让客户告诉我他们的兴趣所在。",
+      "required": true
+    },
+    {
+      "id": "fldufUlsG9",
+      "field": "我能够通过提问让客户认识到使用我的产品可以带来的利益。",
+      "number": 55,
+      "text": "我能够通过提问让客户认识到使用我的产品可以带来的利益。",
+      "required": true
+    },
+    {
+      "id": "fldRXbKvtH",
+      "field": "在演示中，我总是能够通过举例向客户显示产品利益。",
+      "number": 56,
+      "text": "在演示中，我总是能够通过举例向客户显示产品利益。",
+      "required": true
+    },
+    {
+      "id": "fldccDvaJp",
+      "field": "介绍产品特性和利益时，我能够联系到客户的需求。",
+      "number": 57,
+      "text": "介绍产品特性和利益时，我能够联系到客户的需求。",
+      "required": true
+    },
+    {
+      "id": "fldxkbS5Kj",
+      "field": "在客户提出异议时，我会让客户参与讨论解决方案。",
+      "number": 58,
+      "text": "在客户提出异议时，我会让客户参与讨论解决方案。",
+      "required": true
+    },
+    {
+      "id": "fldKkbe3df",
+      "field": "在请求客户作出决定时，我展示出积极的眼神和自信的姿态。",
+      "number": 59,
+      "text": "在请求客户作出决定时，我展示出积极的眼神和自信的姿态。",
+      "required": true
+    },
+    {
+      "id": "fld2v3bCAR",
+      "field": "我关注能为客户带来额外价值的具体行动。",
+      "number": 60,
+      "text": "我关注能为客户带来额外价值的具体行动。",
+      "required": true
+    },
+    {
+      "id": "fldQZ1Qj3s",
+      "field": "我把工作目标分解为每日的小目标。",
+      "number": 61,
+      "text": "我把工作目标分解为每日的小目标。",
+      "required": true
+    },
+    {
+      "id": "fldKgLEwZh",
+      "field": "当客户承诺使用我的产品时，我感到激动和欣慰。",
+      "number": 62,
+      "text": "当客户承诺使用我的产品时，我感到激动和欣慰。",
+      "required": true
+    },
+    {
+      "id": "fldBTvPlea",
+      "field": "面对不利的局面，我能够控制好情绪，并作出积极回应。",
+      "number": 63,
+      "text": "面对不利的局面，我能够控制好情绪，并作出积极回应。",
+      "required": true
+    },
+    {
+      "id": "fldWBrIRYx",
+      "field": "在和别人交谈时，我能够凭直觉感受到别人的反应。",
+      "number": 64,
+      "text": "在和别人交谈时，我能够凭直觉感受到别人的反应。",
+      "required": true
+    },
+    {
+      "id": "fldDA6cFeq",
+      "field": "每次拜访的目标都很明确，可以衡量，可以落实到具体行动。",
+      "number": 65,
+      "text": "每次拜访的目标都很明确，可以衡量，可以落实到具体行动。",
+      "required": true
+    },
+    {
+      "id": "fldNay02BQ",
+      "field": "在和别人打交道时，我注意留下良好的第一印象。",
+      "number": 66,
+      "text": "在和别人打交道时，我注意留下良好的第一印象。",
+      "required": true
+    },
+    {
+      "id": "fldIqOU2gP",
+      "field": "我通过提问引导客户发现自己的需求和问题。",
+      "number": 67,
+      "text": "我通过提问引导客户发现自己的需求和问题。",
+      "required": true
+    },
+    {
+      "id": "fldeEZD1aZ",
+      "field": "在演示中，我总是要求客户给予反馈和回应。",
+      "number": 68,
+      "text": "在演示中，我总是要求客户给予反馈和回应。",
+      "required": true
+    },
+    {
+      "id": "fld0Iub2jq",
+      "field": "我努力赢得所有院方人员的信任。",
+      "number": 69,
+      "text": "我努力赢得所有院方人员的信任。",
+      "required": true
+    },
+    {
+      "id": "fldTDgLtxj",
+      "field": "客户和我意见相左时，我会努力澄清问题，而不是去极力争辩。",
+      "number": 70,
+      "text": "客户和我意见相左时，我会努力澄清问题，而不是去极力争辩。",
+      "required": true
+    },
+    {
+      "id": "fldtINYFsD",
+      "field": "我要求客户履行他们作出的承诺。",
+      "number": 71,
+      "text": "我要求客户履行他们作出的承诺。",
+      "required": true
+    },
+    {
+      "id": "fldhKSgcTU",
+      "field": "每次拜访结束后，我总会抱着学习的心态问自己“从这次拜访中又学习到什么？”。",
+      "number": 72,
+      "text": "每次拜访结束后，我总会抱着学习的心态问自己“从这次拜访中又学习到什么？”。",
+      "required": true
+    },
+    {
+      "id": "fldGYHlIQG",
+      "field": "在设定目标时，我总是会同时设定一个实现目标的具体日期。",
+      "number": 73,
+      "text": "在设定目标时，我总是会同时设定一个实现目标的具体日期。",
+      "required": true
+    },
+    {
+      "id": "fldNjreoIi",
+      "field": "我渴望成功，不怕被人拒绝。",
+      "number": 74,
+      "text": "我渴望成功，不怕被人拒绝。",
+      "required": true
+    },
+    {
+      "id": "fldDEE7MQI",
+      "field": "为了实现更远大的目标，我永不满足。",
+      "number": 75,
+      "text": "为了实现更远大的目标，我永不满足。",
+      "required": true
+    },
+    {
+      "id": "fldpkoLME2",
+      "field": "我能够与各种类型的人打交道。",
+      "number": 76,
+      "text": "我能够与各种类型的人打交道。",
+      "required": true
+    },
+    {
+      "id": "fldtgFZUFd",
+      "field": "在每个访前计划里，我都写下一至两个旨在挖掘客户需求的具体问题。",
+      "number": 77,
+      "text": "在每个访前计划里，我都写下一至两个旨在挖掘客户需求的具体问题。",
+      "required": true
+    },
+    {
+      "id": "fldpCoqHFc",
+      "field": "在与人接触时，我能够判断这个人的行为风格。",
+      "number": 78,
+      "text": "在与人接触时，我能够判断这个人的行为风格。",
+      "required": true
+    },
+    {
+      "id": "fld6jPPi0u",
+      "field": "我能够听到人们的言外之意，并且能够感同身受。",
+      "number": 79,
+      "text": "我能够听到人们的言外之意，并且能够感同身受。",
+      "required": true
+    },
+    {
+      "id": "fldcNvGptU",
+      "field": "在客户承认他有需求之前，我不会进行产品演示。",
+      "number": 80,
+      "text": "在客户承认他有需求之前，我不会进行产品演示。",
+      "required": true
+    },
+    {
+      "id": "fldZ6Im2h9",
+      "field": "我认为相互信任和尊重是获取长期销售成功的基础。",
+      "number": 81,
+      "text": "我认为相互信任和尊重是获取长期销售成功的基础。",
+      "required": true
+    },
+    {
+      "id": "fldTcHJzEm",
+      "field": "如果我不知道问题的答案， 我会坦白地告诉客户我会努力寻找答案。",
+      "number": 82,
+      "text": "如果我不知道问题的答案， 我会坦白地告诉客户我会努力寻找答案。",
+      "required": true
+    },
+    {
+      "id": "fldj0OWiOt",
+      "field": "在要求客户作出决定之前，我的脑海中会浮现出客户和患者享受到我产品利益时的画面。",
+      "number": 83,
+      "text": "在要求客户作出决定之前，我的脑海中会浮现出客户和患者享受到我产品利益时的画面。",
+      "required": true
+    },
+    {
+      "id": "fldEzrgLyX",
+      "field": "每次拜访后我会详细记录拜访情况。",
+      "number": 84,
+      "text": "每次拜访后我会详细记录拜访情况。",
+      "required": true
+    },
+    {
+      "id": "fldtoIt1Zi",
+      "field": "我的工作目标符合我的价值观。",
+      "number": 85,
+      "text": "我的工作目标符合我的价值观。",
+      "required": true
+    },
+    {
+      "id": "fldFA9beF2",
+      "field": "我愿意冒险，但是绝不盲目冒进。",
+      "number": 86,
+      "text": "我愿意冒险，但是绝不盲目冒进。",
+      "required": true
+    },
+    {
+      "id": "fldNj0MY5K",
+      "field": "我能够体会到自己的情感，以及它对行为产生的影响。",
+      "number": 87,
+      "text": "我能够体会到自己的情感，以及它对行为产生的影响。",
+      "required": true
+    },
+    {
+      "id": "fldJU3eeB3",
+      "field": "我经常考虑如何满足别人的需求，而不是自己的需求。",
+      "number": 88,
+      "text": "我经常考虑如何满足别人的需求，而不是自己的需求。",
+      "required": true
+    },
+    {
+      "id": "fldGv8SnfB",
+      "field": "我认为访前计划能为我带来竞争优势。",
+      "number": 89,
+      "text": "我认为访前计划能为我带来竞争优势。",
+      "required": true
+    },
+    {
+      "id": "fldZHP2mrn",
+      "field": "我总是根据客户行为风格调整自己接近客户的方式。",
+      "number": 90,
+      "text": "我总是根据客户行为风格调整自己接近客户的方式。",
+      "required": true
+    },
+    {
+      "id": "fldUYpeBfs",
+      "field": "我倾听客户的需求，并将我的理解复述给客户。",
+      "number": 91,
+      "text": "我倾听客户的需求，并将我的理解复述给客户。",
+      "required": true
+    },
+    {
+      "id": "fldWZRgPUI",
+      "field": "我从不推销自己不信任的产品或服务。",
+      "number": 92,
+      "text": "我从不推销自己不信任的产品或服务。",
+      "required": true
+    },
+    {
+      "id": "fld0O49O7r",
+      "field": "如果我的产品不是符合患者利益的最佳选择，我绝不会要求客户使用我的产品。",
+      "number": 93,
+      "text": "如果我的产品不是符合患者利益的最佳选择，我绝不会要求客户使用我的产品。",
+      "required": true
+    },
+    {
+      "id": "fld94OGTgw",
+      "field": "在商议中过程中我会做到放下自我。",
+      "number": 94,
+      "text": "在商议中过程中我会做到放下自我。",
+      "required": true
+    },
+    {
+      "id": "fldNVKCPNF",
+      "field": "如果我的产品最符合医生或患者的利益，我觉得我有责任要求客户作出承诺，选择我的产品。",
+      "number": 95,
+      "text": "如果我的产品最符合医生或患者的利益，我觉得我有责任要求客户作出承诺，选择我的产品。",
+      "required": true
+    },
+    {
+      "id": "fldHIydphh",
+      "field": "根据前一次拜访的访后记录，我会制定出下一次拜访的目标。",
+      "number": 96,
+      "text": "根据前一次拜访的访后记录，我会制定出下一次拜访的目标。",
+      "required": true
+    },
+    {
+      "id": "fldS2jZ3GS",
+      "field": "我认为我所有的目标都有可能实现。",
+      "number": 97,
+      "text": "我认为我所有的目标都有可能实现。",
+      "required": true
+    },
+    {
+      "id": "fldKjvWy5i",
+      "field": "我孜孜不倦地寻找新方法来为自己打造竞争优势，提高销售业绩。",
+      "number": 98,
+      "text": "我孜孜不倦地寻找新方法来为自己打造竞争优势，提高销售业绩。",
+      "required": true
+    },
+    {
+      "id": "fldHwt12uz",
+      "field": "失望挫折从未动摇我实现目标的决心。",
+      "number": 99,
+      "text": "失望挫折从未动摇我实现目标的决心。",
+      "required": true
+    },
+    {
+      "id": "fld3O684gk",
+      "field": "我努力多倾听、少说话， 倾听的时间比说话时间至少要多一倍。",
+      "number": 100,
+      "text": "我努力多倾听、少说话， 倾听的时间比说话时间至少要多一倍。",
+      "required": true
+    },
+    {
+      "id": "fldyARGiSv",
+      "field": "销售拜访前我写下自己认为能够实现的目标。",
+      "number": 101,
+      "text": "销售拜访前我写下自己认为能够实现的目标。",
+      "required": true
+    },
+    {
+      "id": "fldLy5yPPO",
+      "field": "我能够让客户谈论他们自己感兴趣的话题。",
+      "number": 102,
+      "text": "我能够让客户谈论他们自己感兴趣的话题。",
+      "required": true
+    },
+    {
+      "id": "fldEDcV07H",
+      "field": "在面谈中我能够发现客户的异议或潜在的顾虑。",
+      "number": 103,
+      "text": "在面谈中我能够发现客户的异议或潜在的顾虑。",
+      "required": true
+    },
+    {
+      "id": "fldv7nkzzX",
+      "field": "我经常能够预料到可能出现的异议，在客户表达出这些异议之前就予以化解。",
+      "number": 104,
+      "text": "我经常能够预料到可能出现的异议，在客户表达出这些异议之前就予以化解。",
+      "required": true
+    },
+    {
+      "id": "fldlrIVMWM",
+      "field": "我一直致力于提高我的专业技能和水平。",
+      "number": 105,
+      "text": "我一直致力于提高我的专业技能和水平。",
+      "required": true
+    },
+    {
+      "id": "fldCriSJjh",
+      "field": "我善于帮助客户解决他们的顾虑和异议。",
+      "number": 106,
+      "text": "我善于帮助客户解决他们的顾虑和异议。",
+      "required": true
+    },
+    {
+      "id": "fldISZ8AgE",
+      "field": "在要求客户作出决定时， 我强调医生和患者所能得到的价值。",
+      "number": 107,
+      "text": "在要求客户作出决定时， 我强调医生和患者所能得到的价值。",
+      "required": true
+    },
+    {
+      "id": "fldGaIDgBv",
+      "field": "在每次拜访结束之后，我会考虑如何进一步巩固我与该客户的关系。",
+      "number": 108,
+      "text": "在每次拜访结束之后，我会考虑如何进一步巩固我与该客户的关系。",
+      "required": true
+    },
+    {
+      "id": "fldlVsfhAL",
+      "field": "我从不怀疑自己针对每一个客户定下的目标。",
+      "number": 109,
+      "text": "我从不怀疑自己针对每一个客户定下的目标。",
+      "required": true
+    },
+    {
+      "id": "fldpZXJANL",
+      "field": "我认为销售工作能给我提供无数机会。",
+      "number": 110,
+      "text": "我认为销售工作能给我提供无数机会。",
+      "required": true
+    },
+    {
+      "id": "fldChBaup3",
+      "field": "我对我周围的人表现出由衷的乐观情绪。",
+      "number": 111,
+      "text": "我对我周围的人表现出由衷的乐观情绪。",
+      "required": true
+    },
+    {
+      "id": "fldFNvIGiW",
+      "field": "我很容易与各种行为风格的人建立融洽的关系。",
+      "number": 112,
+      "text": "我很容易与各种行为风格的人建立融洽的关系。",
+      "required": true
+    },
+    {
+      "id": "fldCEWps9S",
+      "field": "我针对每一位客户制定长期目标。",
+      "number": 113,
+      "text": "我针对每一位客户制定长期目标。",
+      "required": true
+    },
+    {
+      "id": "fldAFS4A2L",
+      "field": "客户凭借直觉可以感受到我的真诚和诚实。",
+      "number": 114,
+      "text": "客户凭借直觉可以感受到我的真诚和诚实。",
+      "required": true
+    },
+    {
+      "id": "fld1fAU8p3",
+      "field": "我提出的问题质量很高，展示出我的专业水平。",
+      "number": 115,
+      "text": "我提出的问题质量很高，展示出我的专业水平。",
+      "required": true
+    },
+    {
+      "id": "fldFCeHHZY",
+      "field": "我精心安排产品演示，展示产品价值。",
+      "number": 116,
+      "text": "我精心安排产品演示，展示产品价值。",
+      "required": true
+    },
+    {
+      "id": "fld59Ce3Dr",
+      "field": "我认为帮助客户把事情做好是应该的。",
+      "number": 117,
+      "text": "我认为帮助客户把事情做好是应该的。",
+      "required": true
+    },
+    {
+      "id": "fldBcwOwOX",
+      "field": "在客户提出顾虑时，我不会极力争辩，而会仔细倾听，理解客户的真实感受。",
+      "number": 118,
+      "text": "在客户提出顾虑时，我不会极力争辩，而会仔细倾听，理解客户的真实感受。",
+      "required": true
+    },
+    {
+      "id": "fld2F4WaIM",
+      "field": "如果客户拒绝我的请求，我会把它理解为这是对事不对人。",
+      "number": 119,
+      "text": "如果客户拒绝我的请求，我会把它理解为这是对事不对人。",
+      "required": true
+    },
+    {
+      "id": "fldHBiWQDa",
+      "field": "在每次拜访之后，我都会评估针对这个客户制定的长期目标的进展状况。",
+      "number": 120,
+      "text": "在每次拜访之后，我都会评估针对这个客户制定的长期目标的进展状况。",
+      "required": true
+    }
+  ],
+  "themes": [
+    {
+      "id": "theme01",
+      "number": 1,
+      "name": "目标明确",
+      "label": "1 目标明确",
+      "questionNumbers": [
+        1,
+        13,
+        25,
+        37,
+        49,
+        61,
+        73,
+        85,
+        97,
+        109
+      ],
+      "questionIndices": [
+        0,
+        12,
+        24,
+        36,
+        48,
+        60,
+        72,
+        84,
+        96,
+        108
+      ]
+    },
+    {
+      "id": "theme02",
+      "number": 2,
+      "name": "渴望成功",
+      "label": "2 渴望成功",
+      "questionNumbers": [
+        2,
+        14,
+        26,
+        38,
+        50,
+        62,
+        74,
+        86,
+        98,
+        110
+      ],
+      "questionIndices": [
+        1,
+        13,
+        25,
+        37,
+        49,
+        61,
+        73,
+        85,
+        97,
+        109
+      ]
+    },
+    {
+      "id": "theme03",
+      "number": 3,
+      "name": "情商",
+      "label": "3 情商",
+      "questionNumbers": [
+        3,
+        15,
+        27,
+        39,
+        51,
+        63,
+        75,
+        87,
+        99,
+        111
+      ],
+      "questionIndices": [
+        2,
+        14,
+        26,
+        38,
+        50,
+        62,
+        74,
+        86,
+        98,
+        110
+      ]
+    },
+    {
+      "id": "theme04",
+      "number": 4,
+      "name": "社交能力",
+      "label": "4 社交能力",
+      "questionNumbers": [
+        4,
+        16,
+        28,
+        40,
+        52,
+        64,
+        76,
+        88,
+        100,
+        112
+      ],
+      "questionIndices": [
+        3,
+        15,
+        27,
+        39,
+        51,
+        63,
+        75,
+        87,
+        99,
+        111
+      ]
+    },
+    {
+      "id": "theme05",
+      "number": 5,
+      "name": "访前计划",
+      "label": "5 访前计划",
+      "questionNumbers": [
+        5,
+        17,
+        29,
+        41,
+        53,
+        65,
+        77,
+        89,
+        101,
+        113
+      ],
+      "questionIndices": [
+        4,
+        16,
+        28,
+        40,
+        52,
+        64,
+        76,
+        88,
+        100,
+        112
+      ]
+    },
+    {
+      "id": "theme06",
+      "number": 6,
+      "name": "接近客户",
+      "label": "6 接近客户",
+      "questionNumbers": [
+        6,
+        18,
+        30,
+        42,
+        54,
+        66,
+        78,
+        90,
+        102,
+        114
+      ],
+      "questionIndices": [
+        5,
+        17,
+        29,
+        41,
+        53,
+        65,
+        77,
+        89,
+        101,
+        113
+      ]
+    },
+    {
+      "id": "theme07",
+      "number": 7,
+      "name": "面谈",
+      "label": "7 面谈",
+      "questionNumbers": [
+        7,
+        19,
+        31,
+        43,
+        55,
+        67,
+        79,
+        91,
+        103,
+        115
+      ],
+      "questionIndices": [
+        6,
+        18,
+        30,
+        42,
+        54,
+        66,
+        78,
+        90,
+        102,
+        114
+      ]
+    },
+    {
+      "id": "theme08",
+      "number": 8,
+      "name": "演示",
+      "label": "8 演示",
+      "questionNumbers": [
+        8,
+        20,
+        32,
+        44,
+        56,
+        68,
+        80,
+        92,
+        104,
+        116
+      ],
+      "questionIndices": [
+        7,
+        19,
+        31,
+        43,
+        55,
+        67,
+        79,
+        91,
+        103,
+        115
+      ]
+    },
+    {
+      "id": "theme09",
+      "number": 9,
+      "name": "验证",
+      "label": "9 验证",
+      "questionNumbers": [
+        9,
+        21,
+        33,
+        45,
+        57,
+        69,
+        81,
+        93,
+        105,
+        117
+      ],
+      "questionIndices": [
+        8,
+        20,
+        32,
+        44,
+        56,
+        68,
+        80,
+        92,
+        104,
+        116
+      ]
+    },
+    {
+      "id": "theme10",
+      "number": 10,
+      "name": "磋商",
+      "label": "10 磋商",
+      "questionNumbers": [
+        10,
+        22,
+        34,
+        46,
+        58,
+        70,
+        82,
+        94,
+        106,
+        118
+      ],
+      "questionIndices": [
+        9,
+        21,
+        33,
+        45,
+        57,
+        69,
+        81,
+        93,
+        105,
+        117
+      ]
+    },
+    {
+      "id": "theme11",
+      "number": 11,
+      "name": "成交",
+      "label": "11 成交",
+      "questionNumbers": [
+        11,
+        23,
+        35,
+        47,
+        59,
+        71,
+        83,
+        95,
+        107,
+        119
+      ],
+      "questionIndices": [
+        10,
+        22,
+        34,
+        46,
+        58,
+        70,
+        82,
+        94,
+        106,
+        118
+      ]
+    },
+    {
+      "id": "theme12",
+      "number": 12,
+      "name": "访后分析",
+      "label": "12 访后分析",
+      "questionNumbers": [
+        12,
+        24,
+        36,
+        48,
+        60,
+        72,
+        84,
+        96,
+        108,
+        120
+      ],
+      "questionIndices": [
+        11,
+        23,
+        35,
+        47,
+        59,
+        71,
+        83,
+        95,
+        107,
+        119
+      ]
+    }
+  ],
+  "generatedAt": "2026-06-11T14:24:51.470Z"
+}
