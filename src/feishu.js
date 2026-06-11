@@ -147,28 +147,101 @@ async function listAllRecords() {
   return allRecords;
 }
 
+// ── Lark-CLI fallback (for local dev when tenant token lacks write scope) ──
+const childProcess = require('child_process');
+const LARK_CLI_RUN = path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules', '@larksuite', 'cli', 'scripts', 'run.js');
+
+function larkCliAvailable() {
+  try {
+    childProcess.execFileSync('node', [LARK_CLI_RUN, '--version'], { stdio: 'ignore', timeout: 5000 });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function larkCliJson(args, input) {
+  let tmpPath = '';
+  try {
+    if (input) {
+      tmpPath = path.join(process.cwd(), `_lk_${Date.now()}.json`);
+      fs.writeFileSync(tmpPath, input, 'utf8');
+      const jsonIdx = args.indexOf('--json');
+      if (jsonIdx !== -1) {
+        const relName = path.basename(tmpPath);
+        args[jsonIdx + 1] = `@${relName}`;
+      }
+    }
+    const result = childProcess.spawnSync('node', [LARK_CLI_RUN, ...args], {
+      encoding: 'utf8', timeout: 30000, stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    if (result.error) throw result.error;
+    if (result.stderr) console.warn('[lark-cli]', result.stderr.slice(0, 200));
+    return JSON.parse(result.stdout);
+  } finally {
+    if (tmpPath) { try { fs.unlinkSync(tmpPath); } catch (e) { /* ignore */ } }
+  }
+}
+
 async function createRecord(fields) {
   await ensureInit();
-  const data = await apiRequest('POST',
-    `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records`,
-    { fields }
-  );
-  if (data.code !== 0) {
-    throw new Error(`create record failed: code=${data.code}, msg=${data.msg}`);
+  try {
+    const data = await apiRequest('POST',
+      `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records`,
+      { fields }
+    );
+    if (data.code !== 0) {
+      if (data.code === 91403 && larkCliAvailable()) {
+        // Fall back to lark-cli
+        const json = JSON.stringify(fields);
+        const result = larkCliJson(['base', '+record-upsert', '--base-token', BASE_TOKEN, '--table-id', TABLE_ID, '--json', json]);
+        if (result.ok) {
+          return { record_id: result.data.record.record_id_list[0], fields, created: result.data.created };
+        }
+        throw new Error(`lark-cli upsert failed: ${JSON.stringify(result.error || result)}`);
+      }
+      throw new Error(`create record failed: code=${data.code}, msg=${data.msg}`);
+    }
+    return data.data.record;
+  } catch (e) {
+    if (e.message.includes('create record failed') || e.message.includes('lark-cli')) throw e;
+    if (larkCliAvailable()) {
+      const json = JSON.stringify(fields);
+      const result = larkCliJson(['base', '+record-upsert', '--base-token', BASE_TOKEN, '--table-id', TABLE_ID, '--json', json]);
+      if (result.ok) {
+        return { record_id: result.data.record.record_id_list[0], fields, created: result.data.created };
+      }
+    }
+    throw e;
   }
-  return data.data.record;
 }
 
 async function updateRecord(recordId, fields) {
   await ensureInit();
-  const data = await apiRequest('PUT',
-    `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records/${recordId}`,
-    { fields }
-  );
-  if (data.code !== 0) {
-    throw new Error(`update record failed: code=${data.code}, msg=${data.msg}`);
+  try {
+    const data = await apiRequest('PUT',
+      `/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${TABLE_ID}/records/${recordId}`,
+      { fields }
+    );
+    if (data.code !== 0) {
+      if (data.code === 91403 && larkCliAvailable()) {
+        const json = JSON.stringify(fields);
+        const result = larkCliJson(['base', '+record-upsert', '--base-token', BASE_TOKEN, '--table-id', TABLE_ID, '--record-id', recordId, '--json', json]);
+        if (result.ok) return result.data.record;
+        throw new Error(`lark-cli upsert failed: ${JSON.stringify(result.error || result)}`);
+      }
+      throw new Error(`update record failed: code=${data.code}, msg=${data.msg}`);
+    }
+    return data.data.record;
+  } catch (e) {
+    if (e.message.includes('update record failed') || e.message.includes('lark-cli')) throw e;
+    if (larkCliAvailable()) {
+      const json = JSON.stringify(fields);
+      const result = larkCliJson(['base', '+record-upsert', '--base-token', BASE_TOKEN, '--table-id', TABLE_ID, '--record-id', recordId, '--json', json]);
+      if (result.ok) return result.data.record;
+    }
+    throw e;
   }
-  return data.data.record;
 }
 
 async function searchRecord(fieldName, value) {
