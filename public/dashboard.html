@@ -559,7 +559,6 @@ async function loadDashboard(force = false) {
 
 function render(data) {
   state.data = data;
-  ensureSelection();
   renderStats(data.stats);
   renderThemeSections(data.dimensions);
   renderPersonLookup();
