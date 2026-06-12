@@ -256,6 +256,23 @@ app.post('/api/admin/clear', async (req, res) => {
   }
 });
 
+app.post('/api/webhook/feishu-base', async (req, res) => {
+  try {
+    const webhookToken = process.env.WEBHOOK_TOKEN || process.env.ADMIN_TOKEN || '';
+    const token = req.headers['x-webhook-token'] || req.query.token || req.body.token || '';
+    if (webhookToken && token !== webhookToken) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+
+    await refreshCache(true);
+    await broadcastIfChanged(true);
+    res.json({ ok: true, stats: getDashboardData().stats });
+  } catch (error) {
+    console.error('[feishu base webhook failed]', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
 app.get('/api/events', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
