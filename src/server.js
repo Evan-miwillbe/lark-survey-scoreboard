@@ -2,7 +2,7 @@ require('./env').loadEnv();
 
 const express = require('express');
 const path = require('path');
-const feishu = require('./feishu');
+const dataClient = require('./data-client');
 const {
   getDashboardData,
   getRawData,
@@ -49,8 +49,8 @@ async function refreshCache(force = false) {
   }
 
   cacheRefreshPromise = (async () => {
-    await feishu.ensureInit();
-    const records = await feishu.listAllRecords();
+    await dataClient.ensureInit();
+    const records = await dataClient.listAllRecords();
     loadFromRecords(records);
     lastCacheRefresh = Date.now();
   })();
@@ -90,7 +90,7 @@ async function broadcastIfChanged(force = false) {
 
 app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
   try {
-    await feishu.ensureInit();
+    await dataClient.ensureInit();
     const { IDENTITY_FIELDS, FIELD_NAMES, SCORE_MAX } = require('./questions');
 
     // --- /api/register ---
@@ -106,7 +106,7 @@ app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
       // Search for existing record by name
       let match = null;
       try {
-        const existing = await feishu.searchRecord(IDENTITY_FIELDS.name, name);
+        const existing = await dataClient.searchRecord(IDENTITY_FIELDS.name, name);
         match = existing.find((r) => {
           const rPhone = String((r.fields[IDENTITY_FIELDS.phone] || '')).replace(/[^\d+]/g, '');
           return rPhone === phone || !phone;
@@ -138,7 +138,7 @@ app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
         [IDENTITY_FIELDS.phone]: phone,
         [IDENTITY_FIELDS.department]: department,
       };
-      const record = await feishu.createRecord(fields);
+      const record = await dataClient.createRecord(fields);
       await refreshCache(true);
 
       return res.json({
@@ -169,7 +169,7 @@ app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
       }
 
       const fieldName = FIELD_NAMES[questionIndex];
-      await feishu.updateRecord(recordId, { [fieldName]: value });
+      await dataClient.updateRecord(recordId, { [fieldName]: value });
       await refreshCache(true);
 
       return res.json({ ok: true, questionIndex, value });
@@ -182,7 +182,7 @@ app.all(['/api/register', '/api/rate', '/api/sync'], async (req, res) => {
         return res.status(400).json({ ok: false, error: '缺少 recordId' });
       }
 
-      const record = await feishu.getRecord(recordId);
+      const record = await dataClient.getRecord(recordId);
       const scores = {};
       for (let i = 0; i < FIELD_NAMES.length; i++) {
         const val = record.fields[FIELD_NAMES[i]];
@@ -234,6 +234,24 @@ app.get('/api/rawdata', async (req, res) => {
     res.json(getRawData());
   } catch (error) {
     console.error('[rawdata failed]', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/clear', async (req, res) => {
+  try {
+    const adminToken = process.env.ADMIN_TOKEN || '';
+    const token = req.headers['x-admin-token'] || req.body.token || '';
+    if (!adminToken || token !== adminToken) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+
+    await dataClient.clearAllRecords();
+    await refreshCache(true);
+    await broadcastIfChanged(true);
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('[admin clear failed]', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });

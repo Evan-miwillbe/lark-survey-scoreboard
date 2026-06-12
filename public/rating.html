@@ -149,12 +149,8 @@ body {
       <input type="text" id="reg-name" placeholder="请输入您的姓名" autocomplete="name">
     </div>
     <div class="form-group">
-      <label>手机号</label>
-      <input type="tel" id="reg-phone" placeholder="用于去重，同名时区分" autocomplete="tel">
-    </div>
-    <div class="form-group">
       <label>部门</label>
-      <input type="text" id="reg-dept" placeholder="可选" autocomplete="organization">
+      <input type="text" id="reg-dept" placeholder="请输入您的部门" autocomplete="organization">
     </div>
     <button class="btn-start" id="btn-start" onclick="doRegister()">开始评分</button>
     <div class="note">120题逐题评分 · 每题点击即时提交 · 可随时退出续填</div>
@@ -193,7 +189,7 @@ const STORAGE_KEY = 'scoreboard_session';
 
 let state = {
   recordId: '',
-  name: '', phone: '', department: '',
+  name: '', department: '',
   scores: {},     // {questionIndex: value}
   dimensions: [], // from /api/questions
   currentTheme: 0,
@@ -212,7 +208,7 @@ function showToast(msg) {
 function saveSession() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     recordId: state.recordId, name: state.name,
-    phone: state.phone, department: state.department,
+    department: state.department,
     scores: state.scores,
   }));
 }
@@ -221,7 +217,6 @@ function clearSession() { localStorage.removeItem(STORAGE_KEY); }
 // ─── Register ───
 async function doRegister() {
   const name = document.getElementById('reg-name').value.trim();
-  const phone = document.getElementById('reg-phone').value.trim();
   const dept = document.getElementById('reg-dept').value.trim();
   if (!name) { showToast('请填写姓名'); return; }
 
@@ -232,14 +227,13 @@ async function doRegister() {
     const res = await fetch(api('/api/register'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, department: dept }),
+      body: JSON.stringify({ name, department: dept }),
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
 
     state.recordId = data.recordId;
     state.name = data.name;
-    state.phone = data.phone;
     state.department = data.department;
     state.scores = data.scores || {};
     state.currentTheme = 0;
@@ -406,7 +400,7 @@ function updateStats() {
 function doLogout() {
   if (confirm('确定退出？已填数据已保存，重新输入姓名即可恢复。')) {
     clearSession();
-    state = { recordId: '', name: '', phone: '', department: '', scores: {}, dimensions: [], currentTheme: 0 };
+    state = { recordId: '', name: '', department: '', scores: {}, dimensions: [], currentTheme: 0 };
     showIdentityScreen();
   }
 }
@@ -431,7 +425,6 @@ async function init() {
         if (data.ok) {
           state.recordId = data.recordId;
           state.name = data.name;
-          state.phone = data.phone;
           state.department = data.department;
           state.scores = data.scores || {};
           state.currentTheme = 0;

@@ -503,10 +503,10 @@ h1 {
 <header class="topbar">
   <div class="title-wrap">
     <h1 id="title">诚信销售能力实时评估大屏</h1>
-    <div class="subtitle" id="subtitle">等待飞书问卷提交</div>
+    <div class="subtitle" id="subtitle">等待实时评分提交</div>
   </div>
   <div class="actions">
-    <a class="btn primary" id="form-link" target="_blank" rel="noopener">打开飞书问卷</a>
+    <a class="btn primary" id="form-link" target="_blank" rel="noopener">打开评分页面</a>
     <a class="btn" id="export-link">导出 CSV</a>
   </div>
 </header>
@@ -539,7 +539,7 @@ h1 {
       </div>
     </div>
     <div class="summary-table-wrap" id="summary-table-wrap">
-      <div class="empty">等待飞书问卷提交</div>
+      <div class="empty">等待实时评分提交</div>
     </div>
   </section>
 
@@ -650,8 +650,8 @@ async function loadQuestions() {
   const res = await fetch(apiUrl('/api/questions'));
   const data = await res.json();
   els.title.textContent = data.title || '诚信销售能力实时评估大屏';
-  els.formLink.href = data.formUrl || '#';
-  els.subtitle.textContent = `${data.dimensions.length} 个板块，${data.questions.length} 题，飞书问卷提交后自动刷新`;
+  els.formLink.href = './rating.html';
+  els.subtitle.textContent = `${data.dimensions.length} 个板块，${data.questions.length} 题，评分提交后自动刷新`;
 }
 
 async function loadDashboard(force = false) {
@@ -681,7 +681,7 @@ function renderStats(stats) {
 
 function renderThemeSections(dimensions) {
   if (!dimensions.length) {
-    els.themesGrid.innerHTML = '<div class="empty">等待飞书问卷提交</div>';
+    els.themesGrid.innerHTML = '<div class="empty">等待实时评分提交</div>';
     return;
   }
 
@@ -735,7 +735,7 @@ function renderSummaryTable(data) {
   const dimensions = data.dimensions || [];
 
   if (!people.length) {
-    els.summaryWrap.innerHTML = '<div class="empty">等待飞书问卷提交</div>';
+    els.summaryWrap.innerHTML = '<div class="empty">等待实时评分提交</div>';
     return;
   }
 
@@ -826,7 +826,7 @@ function renderPersonLookup() {
 
 function renderMatches(people) {
   if (!state.data || !allPeople().length) {
-    els.matches.innerHTML = '<div class="empty">暂无人员数据。提交飞书问卷后即可查询。</div>';
+    els.matches.innerHTML = '<div class="empty">暂无人员数据。提交实时评分后即可查询。</div>';
     return;
   }
 
