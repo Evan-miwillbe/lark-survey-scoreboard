@@ -253,23 +253,27 @@ async function doRegister() {
 
 // ─── Load config ───
 async function loadDimensions() {
-  try {
-    const res = await fetch(api('/api/questions'));
-    const data = await res.json();
-    const allQuestions = data.questions || [];
-    state.dimensions = (data.dimensions || []).map((dim) => ({
+  const res = await fetch(api('/api/questions'));
+  const data = await res.json();
+  if (!res.ok || data.ok === false) throw new Error(data.error || '题目配置加载失败');
+
+  const allQuestions = data.questions || [];
+  state.dimensions = (data.dimensions || []).map((dim) => {
+    const indices = dim.questionIndices || [];
+    const numbers = dim.questionNumbers || [];
+    return {
       id: dim.id, number: dim.number, name: dim.name, shortName: dim.shortName,
-      questionIndices: dim.questionIndices, questionNumbers: dim.questionNumbers,
-      questions: dim.questionIndices.map((idx, i) => ({
+      questionIndices: indices, questionNumbers: numbers,
+      questions: indices.map((idx, i) => ({
         index: idx,
-        number: dim.questionNumbers ? dim.questionNumbers[i] : (idx + 1),
+        number: numbers[i] || (idx + 1),
         text: allQuestions[idx] ? allQuestions[idx].text : `题目 ${idx + 1}`,
       })),
-    }));
-    document.getElementById('survey-title').textContent = data.title || '诚信销售能力评估';
-  } catch (e) {
-    console.error('Failed to load questions config', e);
-  }
+    };
+  });
+
+  if (!state.dimensions.length) throw new Error('题目配置为空，请刷新重试');
+  document.getElementById('survey-title').textContent = data.title || '诚信销售能力评估';
 }
 
 // ─── Switch screens ───
@@ -277,6 +281,10 @@ function showScoringScreen() {
   document.getElementById('identity-screen').style.display = 'none';
   document.getElementById('scoring-screen').classList.add('active');
   document.getElementById('person-name-display').textContent = state.name;
+  if (!state.dimensions.length) {
+    document.getElementById('questions-scroll').innerHTML = '<div class="empty-questions">题目加载失败，请点退出后重新进入</div>';
+    return;
+  }
   renderThemeTabs();
   renderQuestions();
   updateStats();
@@ -411,7 +419,14 @@ function escHtml(s) {
 
 // ─── Init ───
 async function init() {
-  await loadDimensions();
+  try {
+    await loadDimensions();
+  } catch (e) {
+    clearSession();
+    showIdentityScreen();
+    showToast(e.message || '题目加载失败');
+    return;
+  }
 
   // Restore session
   const saved = localStorage.getItem(STORAGE_KEY);
